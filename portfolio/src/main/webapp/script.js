@@ -28,10 +28,20 @@ function addRandomGreeting() {
 }
 
 /**
- * Adds a 'Hello' message to the page.
+ * Adds comments to the page.
  */
-function getHelloMessage() {
-    fetch('/data').then(response => response.text()).then((message) => {
-        document.getElementById('hello-message-container').innerText = message;
+function addComments() {
+    fetch('/data').then(response => response.json()).then((messages) => {
+        const commentContainer = document.getElementById('comment-container');
+        messages.forEach((message) => {
+          commentContainer.append(createListElement(message));
+        });
     });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
 }
