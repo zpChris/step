@@ -4,3 +4,8 @@
   width: 650px;
   line-height: 1.4;
 }
+
+a {
+    color: #0645AD;
+    text-decoration: none;
+}
