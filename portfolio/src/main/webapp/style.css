@@ -25,3 +25,20 @@ a {
 .project {
     margin: 10px 0px;
 }
+
+ol {
+    line-height: 1.4;
+}
+
+.gallery-container {
+    display: flex;
+}
+
+.gallery-image-container {
+    flex-basis: 30%;
+    margin: 0px 10px;
+}
+
+.gallery-image {
+    width: 100%;
+}
