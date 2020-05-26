@@ -12,4 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * Adds a random fun fact about myself to the page.
+ */
+function addRandomFact() {
+  const facts =
+      ['I have two older brothers!',
+       'I\'ve played tennis for fourteen years!', 
+       'My favorite book is Enlightenment Now by Steven Pinker.', 
+       'My favorite TV show is It\'s Always Sunny in Philadelphia.'];
 
+  // Pick a random fact.
+  const fact = facts[Math.floor(Math.random() * facts.length)];
+
+  // Add it to the page.
+  const factContainer = document.getElementById('fact-container');
+  factContainer.innerText = fact;
+}

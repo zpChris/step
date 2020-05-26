@@ -5,6 +5,10 @@
   line-height: 1.1;
 }
 
+#fact-container {	
+  margin-top: 20px;	
+}
+
 p {
     line-height: 1.4;
 }
