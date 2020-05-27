@@ -31,28 +31,30 @@ function addRandomFact() {
 }
 
 /**
- * Fades in div section once the window reaches halfway through the div.
+ * Fades in / out div section once the window reaches the top-quarter of the div.
  * Works with individual or multiple divs.
  */
-function fadeInDiv(classOrIdName) {
+function fadeDiv(classOrIdName) {
     var window_bottom = $(window).scrollTop() + $(window).height();
 
-    // Conditionally fade in each div of specified class or id name.
+    // Conditionally fade each div of specified class or id name.
     $(classOrIdName).each(function() {
-        var object_middle = $(this).offset().top + $(this).outerHeight() / 2;
+        var object_top_quarter = $(this).offset().top + $(this).outerHeight() / 4;
 
-        // Fade in div if window reached halfway marker;
-        if (window_bottom > object_middle) {
-            $(this).fadeTo('slow', 1);
+        // Fade div if window reached top-quarter marker.
+        if (window_bottom > object_top_quarter) {
+            $(this).addClass('fade-in');
+        } else {
+            $(this).removeClass('fade-in');
         }
     });
 }
 
-/* Triggered upon DOM load */
+// Triggered upon DOM load.
 $(document).ready(() => {
-    fadeInDiv('.project');
-    /* Event every time user scrolls */
+    fadeDiv('.project');
+    // Event every time user scrolls.
     $(window).scroll(() => {
-        fadeInDiv('.project');
+        fadeDiv('.project');
     });
 });
