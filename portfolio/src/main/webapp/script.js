@@ -28,4 +28,21 @@ function addRandomFact() {
   // Add it to the page.
   const factContainer = document.getElementById('fact-container');
   factContainer.innerText = fact;
+
+  // Add 'Hide fun fact' button to the page.
+  const hideFactButton = document.getElementById('fun-fact-hide');
+  hideFactButton.style.display = 'inline-block';
+}
+
+/**
+ * Hides the random fact from user.
+ */
+function hideRandomFact() {
+    // Remove it from the page. 
+    const factContainer = document.getElementById('fact-container');
+    factContainer.innerText = '';
+
+    // Remove 'Hide fun fact' button from the page.
+    const hideFactButton = document.getElementById('fun-fact-hide');
+    hideFactButton.style.display = 'none';
 }
