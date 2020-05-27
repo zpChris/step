@@ -15,14 +15,14 @@
 /**
  * Adds a random fun fact about myself to the page.
  */
-function addRandomFact() {
+function addFunFact() {
   const facts =
       ['I have two older brothers!',
        'I\'ve played tennis for fourteen years!', 
        'My favorite book is Enlightenment Now by Steven Pinker.', 
        'My favorite TV show is It\'s Always Sunny in Philadelphia.'];
 
-  // Pick a random fact.
+  // Pick a random fun fact.
   const fact = facts[Math.floor(Math.random() * facts.length)];
 
   // Add it to the page.
@@ -35,9 +35,9 @@ function addRandomFact() {
 }
 
 /**
- * Hides the random fact from user.
+ * Hides the fun fact from user.
  */
-function hideRandomFact() {
+function hideFunFact() {
     // Remove it from the page. 
     const factContainer = document.getElementById('fact-container');
     factContainer.innerText = '';
