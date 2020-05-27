@@ -5,8 +5,22 @@
   line-height: 1.1;
 }
 
-#fact-container {	
-  margin-top: 20px;	
+#fun-fact {
+    margin: 10px 0px;
+    background-color: rgb(202, 232, 241);
+}
+
+#fun-fact:hover {
+    background-color: lightblue;
+}
+
+button {
+    border: none;
+    padding: 7.5px;
+}
+
+button:hover {
+    cursor: pointer;
 }
 
 p {
