@@ -29,3 +29,30 @@ function addRandomFact() {
   const factContainer = document.getElementById('fact-container');
   factContainer.innerText = fact;
 }
+
+/**
+ * Fades in div section once the window reaches halfway through the div.
+ * Works with individual or multiple divs.
+ */
+function fadeInDiv(classOrIdName) {
+    var window_bottom = $(window).scrollTop() + $(window).height();
+
+    // Conditionally fade in each div of specified class or id name.
+    $(classOrIdName).each(function() {
+        var object_middle = $(this).offset().top + $(this).outerHeight() / 2;
+
+        // Fade in div if window reached halfway marker;
+        if (window_bottom > object_middle) {
+            $(this).fadeTo('slow', 1);
+        }
+    });
+}
+
+/* Triggered upon DOM load */
+$(document).ready(() => {
+    fadeInDiv('.project');
+    /* Event every time user scrolls */
+    $(window).scroll(() => {
+        fadeInDiv('.project');
+    });
+});

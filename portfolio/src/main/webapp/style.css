@@ -28,6 +28,7 @@ a {
 
 .project {
     margin: 10px 0px;
+    opacity: 0;
 }
 
 ol {
