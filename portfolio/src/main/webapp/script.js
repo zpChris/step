@@ -17,10 +17,10 @@
  */
 function addFunFact() {
   const facts =
-      ['I have two older brothers!',
-       'I\'ve played tennis for fourteen years!', 
-       'My favorite book is Enlightenment Now by Steven Pinker.', 
-       'My favorite TV show is It\'s Always Sunny in Philadelphia.'];
+    ['I have two older brothers!',
+      'I\'ve played tennis for fourteen years!', 
+      'My favorite book is Enlightenment Now by Steven Pinker.', 
+      'My favorite TV show is It\'s Always Sunny in Philadelphia.'];
 
   // Pick a random fun fact.
   const fact = facts[Math.floor(Math.random() * facts.length)];
@@ -38,11 +38,11 @@ function addFunFact() {
  * Hides the fun fact from user.
  */
 function hideFunFact() {
-    // Remove it from the page. 
-    const factContainer = document.getElementById('fact-container');
-    factContainer.innerText = '';
+  // Remove it from the page. 
+  const factContainer = document.getElementById('fact-container');
+  factContainer.innerText = '';
 
-    // Remove 'Hide fun fact' button from the page.
-    const hideFactButton = document.getElementById('fun-fact-hide');
-    hideFactButton.style.display = 'none';
+  // Remove 'Hide fun fact' button from the page.
+  const hideFactButton = document.getElementById('fun-fact-hide');
+  hideFactButton.style.display = 'none';
 }
