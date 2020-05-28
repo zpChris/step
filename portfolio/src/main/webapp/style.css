@@ -6,95 +6,95 @@
 }
 
 #fun-fact {
-    margin: 10px 0px;
-    background-color: rgb(202, 232, 241);
+  margin: 10px 0px;
+  background-color: rgb(202, 232, 241);
 }
 
 #fun-fact:hover {
-    background-color: lightblue;
+  background-color: lightblue;
 }
 
 #fun-fact-hide {
-    background-color: rgb(228, 228, 228);
-    display: none;
+  background-color: rgb(228, 228, 228);
+  display: none;
 }
 
 #fun-fact-hide:hover {
-    background-color: lightgray;
+  background-color: lightgray;
 }
 
 button {
-    border: none;
-    padding: 7.5px;
+  border: none;
+  padding: 7.5px;
 }
 
 button:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 p {
-    line-height: 1.4;
+  line-height: 1.4;
 }
 
 a {
-    position: relative;
-    color: rgb(64, 64, 250);
-    text-decoration: none;
+  position: relative;
+  color: rgb(64, 64, 250);
+  text-decoration: none;
 }
 
 a:hover {
-    color: blue;
+  color: blue;
 }
 
 a:hover::after {
-    border-bottom: 2px solid blue;
-    right: 0;
+  border-bottom: 2px solid blue;
+  right: 0;
 }
 
 a::after {
-    content: "";
-    position: absolute;
-    right: 100%;
-    bottom: 0;
-    left: 0;
-    transition: right .4s cubic-bezier(0,.5,0,1);
+  content: "";
+  position: absolute;
+  right: 100%;
+  bottom: 0;
+  left: 0;
+  transition: right .4s cubic-bezier(0,.5,0,1);
 }
 
 #profile-links {
-    margin: 10px 0px;
+  margin: 10px 0px;
 }
 
 .profile-link {
-    margin-right: 7.5px;
+  margin-right: 7.5px;
 }
 
 .project {
-    margin: 20px 0px;
-    padding: 7.5px 12.5px;
-    background-color: rgb(241, 241, 241);
-    border-radius: 5px;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    transition: all 0.2s;
+  margin: 20px 0px;
+  padding: 7.5px 12.5px;
+  background-color: rgb(241, 241, 241);
+  border-radius: 5px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  transition: all 0.2s;
 }
 
 .project:hover {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
-    background-color: rgb(233, 233, 233);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  background-color: rgb(233, 233, 233);
 }
 
 ol {
-    line-height: 1.4;
+  line-height: 1.4;
 }
 
 .gallery-container {
-    display: flex;
+  display: flex;
 }
 
 .gallery-image-container {
-    flex-basis: 30%;
-    margin: 0px 10px;
+  flex-basis: 30%;
+  margin: 0px 10px;
 }
 
 .gallery-image {
-    width: 100%;
+  width: 100%;
 }
