@@ -5,52 +5,75 @@
   line-height: 1.1;
 }
 
-#fact-container {	
-  margin-top: 20px;	
+#fun-fact {
+  margin: 10px 0px;
+  background-color: rgb(202, 232, 241);
+}
+
+#fun-fact:hover {
+  background-color: lightblue;
+}
+
+#fun-fact-hide {
+  background-color: rgb(228, 228, 228);
+  display: none;
+}
+
+#fun-fact-hide:hover {
+  background-color: lightgray;
+}
+
+button {
+  border: none;
+  padding: 7.5px;
+}
+
+button:hover {
+  cursor: pointer;
 }
 
 p {
-    line-height: 1.4;
+  line-height: 1.4;
 }
 
 a {
-    color: #0645AD;
-    text-decoration: underline;
+  color: #0645AD;
+  text-decoration: underline;
 }
 
 #profile-links {
-    margin: 10px 0px;
+  margin: 10px 0px;
 }
 
 .profile-link {
-    padding-right: 7.5px;
+  padding-right: 7.5px;
 }
 
 .project {
-    margin: 10px 0px;
-    opacity: 0;
-    transform: translate(0, 10px);
-    transition: all 1s;
+  margin: 10px 0px;
+  opacity: 0;
+  transform: translate(0, 10px);
+  transition: all 1s;
 }
 
 .fade-in {
-    opacity: 1;
-    transform: translate(0, 0);
+  opacity: 1;
+  transform: translate(0, 0);
 }
 
 ol {
-    line-height: 1.4;
+  line-height: 1.4;
 }
 
 .gallery-container {
-    display: flex;
+  display: flex;
 }
 
 .gallery-image-container {
-    flex-basis: 30%;
-    margin: 0px 10px;
+  flex-basis: 30%;
+  margin: 0px 10px;
 }
 
 .gallery-image {
-    width: 100%;
+  width: 100%;
 }
