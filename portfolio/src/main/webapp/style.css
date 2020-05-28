@@ -58,6 +58,8 @@ a::after {
   bottom: 0;
   left: 0;
   transition: right .4s cubic-bezier(0,.5,0,1);
+  color: #0645AD;
+  text-decoration: underline;
 }
 
 #profile-links {

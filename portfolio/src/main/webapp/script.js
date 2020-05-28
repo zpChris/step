@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// The "fact number" of the previous fact given. "-1" is special value.
+let prevFactNum = -1;
+
 /**
  * Adds a random fun fact about myself to the page.
  */
@@ -22,8 +25,22 @@ function addFunFact() {
       'My favorite book is Enlightenment Now by Steven Pinker.', 
       'My favorite TV show is It\'s Always Sunny in Philadelphia.'];
 
-  // Pick a random fun fact.
-  const fact = facts[Math.floor(Math.random() * facts.length)];
+  // Pick a random number corresponding to a fun fact.
+  let factNum = Math.floor(Math.random() * facts.length);
+
+  // If the same fact number is chosen twice consecutively, change the fact number.
+  if (factNum === prevFactNum) {
+    factNum++;
+    if (factNum == 4) {
+      factNum = 0;
+    }
+  }
+
+  // Update the previous fact number.
+  prevFactNum = factNum;
+
+  // Pick the corresponding fun fact.
+  const fact = facts[factNum];
 
   // Add it to the page.
   const factContainer = document.getElementById('fact-container');
