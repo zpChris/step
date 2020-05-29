@@ -43,12 +43,12 @@ function addFunFact() {
   const fact = facts[factNum];
 
   // Add it to the page.
-  const factContainer = document.getElementById('fact-container');
+  $('.fact-container').addClass('fade-in-fact-container');
+  const factContainer = document.getElementsByClassName('fact-container')[0];
   factContainer.innerText = fact;
 
-    // Add 'Hide fun fact' button to the page.
-  const hideFactButton = document.getElementById('fun-fact-hide');
-  hideFactButton.style.display = 'inline-block';
+  // Add 'Hide fun fact' button to the page.
+  $('.fun-fact-hide').addClass('fade-in-fun-fact-hide');
 }
 
 /**
@@ -56,12 +56,12 @@ function addFunFact() {
  */
 function hideFunFact() {
   // Remove it from the page. 
-  const factContainer = document.getElementById('fact-container');
+  $('.fact-container').removeClass('fade-in-fact-container');
+  const factContainer = document.getElementsByClassName('fact-container')[0];
   factContainer.innerText = '';
 
   // Remove 'Hide fun fact' button from the page.
-  const hideFactButton = document.getElementById('fun-fact-hide');
-  hideFactButton.style.display = 'none';
+  $('.fun-fact-hide').removeClass('fade-in-fun-fact-hide');
 }
 
 /**
@@ -77,9 +77,9 @@ function fadeDiv(classOrIdName) {
 
     // Fade div if window reached top-quarter marker.
     if (window_bottom > object_top_quarter) {
-      $(this).addClass('fade-in');
+      $(this).addClass('fade-in-project');
     } else {
-      $(this).removeClass('fade-in');
+      $(this).removeClass('fade-in-project');
     }
   });
 }
