@@ -46,7 +46,7 @@ function addFunFact() {
   const factContainer = document.getElementById('fact-container');
   factContainer.innerText = fact;
 
-  // Add 'Hide fun fact' button to the page.
+    // Add 'Hide fun fact' button to the page.
   const hideFactButton = document.getElementById('fun-fact-hide');
   hideFactButton.style.display = 'inline-block';
 }
@@ -63,3 +63,42 @@ function hideFunFact() {
   const hideFactButton = document.getElementById('fun-fact-hide');
   hideFactButton.style.display = 'none';
 }
+
+/**
+ * Fades in / out div section once the window reaches the top-quarter of the div.
+ * Works with individual or multiple divs.
+ */
+function fadeDiv(classOrIdName) {
+  var window_bottom = $(window).scrollTop() + $(window).height();
+
+  // Conditionally fade each div of specified class or id name.
+  $(classOrIdName).each(function() {
+    var object_top_quarter = $(this).offset().top + $(this).outerHeight() / 4;
+
+    // Fade div if window reached top-quarter marker.
+    if (window_bottom > object_top_quarter) {
+      $(this).addClass('fade-in');
+    } else {
+      $(this).removeClass('fade-in');
+    }
+  });
+}
+
+// Triggered upon DOM load.
+$(document).ready(() => {
+  fadeDiv('.project');
+  // Event every time user scrolls.
+  $(window).scroll(() => {
+    fadeDiv('.project');
+  });
+
+  // Event every time the window resizes.
+  $(window).resize(() => {
+    fadeDiv('.project');
+  });
+
+  // Event every time the screen orientation changes.
+  $(window).on('orientationchange', () => {
+    fadeDiv('.project');
+  });
+});
