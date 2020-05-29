@@ -84,8 +84,16 @@ function fadeDiv(classOrIdName) {
   });
 }
 
+/**
+ * Translate the body content into position on page load.
+ */
+function translateContent() {
+  $('.content').addClass('translate-content');
+}
+
 // Triggered upon DOM load.
 $(document).ready(() => {
+  translateContent();
   fadeDiv('.project');
   // Event every time user scrolls.
   $(window).scroll(() => {
