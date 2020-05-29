@@ -51,6 +51,14 @@ a {
 
 .project {
   margin: 10px 0px;
+  opacity: 0;
+  transform: translate(0, 10px);
+  transition: all 1s;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translate(0, 0);
 }
 
 ol {
