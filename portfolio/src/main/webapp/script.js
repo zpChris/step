@@ -102,3 +102,12 @@ $(document).ready(() => {
     fadeDiv('.project');
   });
 });
+
+/**
+ * Animation effect initiated when changing URL on website.
+ */
+function changePage(url) {
+  $('body').effect('clip', 300, () => {
+    window.location.replace(url);
+  });
+}

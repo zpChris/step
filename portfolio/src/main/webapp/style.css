@@ -39,6 +39,7 @@ p {
 a {
   color: #0645AD;
   text-decoration: underline;
+  cursor: pointer;
 }
 
 #profile-links {
