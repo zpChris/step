@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="addComments()">
     <div id="content">
       <h1>Chris Elliott</h1>
       <div id="profile-links">
@@ -20,6 +20,8 @@
       <button id="fun-fact" onclick="addFunFact()">Learn something about me!</button>
       <button id="fun-fact-hide" onclick="hideFunFact()">Hide fun fact</button>
       <div id="fact-container"></div>
+      <h2>Comments</h2>
+      <div id="comment-container"></div>
       <h2>Background</h2>
       <p>
         I am a student in the University of Pennsylvania's Management and 
