@@ -102,3 +102,18 @@ $(document).ready(() => {
     fadeDiv('.project');
   });
 });
+
+/**
+ * Adds a greeting to the page.
+ */
+function addGreeting() {
+  fetch('/data').then(response => response.text()).then((greeting) => {
+    // Convert the HTML string into a document object
+	  let parser = new DOMParser();
+	  let greetingObject = parser.parseFromString(greeting, 'text/html');
+
+    // Add H1 greeting object to HTML page
+    let greetingContainer = document.getElementById('greeting-container');
+    greetingContainer.append(greetingObject.documentElement);
+  });
+}
