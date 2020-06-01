@@ -14,6 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -54,6 +57,16 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html;");
     String comment = getParameter(request, "text-input", "");
+
+    // Create a comment entity.
+    Entity commentEntity = new Entity("Comment");
+    commentEntity.setProperty("text", comment);
+
+    // Add the comment entity to the DatastoreService.
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    datastore.put(commentEntity);
+
+    // Store the comment locally.
     comments.add(comment);
 
     // Redirect back to the HTML page.
