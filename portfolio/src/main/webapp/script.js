@@ -109,10 +109,12 @@ $(document).ready(() => {
  * Adds comments to the page.
  */
 function addComments() {
-  fetch('/data').then(response => response.json()).then((messages) => {
+  console.log("Hello!");
+  fetch('/data').then(response => response.json()).then((comments) => {
+    console.log(comments);
     const commentContainer = document.getElementById('comment-container');
-    messages.forEach((message) => {
-      commentContainer.append(createListElement(message));
+    comments.forEach((comment) => {
+      commentContainer.append(createListElement(comment));
     });
   });
 }
@@ -120,9 +122,10 @@ function addComments() {
 /** 
  * Creates an <li> element containing text. 
  */
-function createListElement(text) {
+function createListElement(comment) {
   const liElement = document.createElement('li');
-  liElement.innerText = text;
+  liElement.innerText = "Text: " + comment.text;
+  liElement.innerText += "\nTime: " + comment.date + " UTC";
   return liElement;
 }
 

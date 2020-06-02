@@ -28,15 +28,16 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that handles comment data. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
    /**
-   * Converts a ServerStats instance into a JSON string using the Gson library.
+   * Converts a List of Comments into a JSON string using the Gson library.
    */
-  private String convertToJsonUsingGson(List<String> messages) {
+  private String convertToJson(List<Comment> messages) {
     Gson gson = new Gson();
     String json = gson.toJson(messages);
     return json;
@@ -45,20 +46,22 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    // Iterate over all entities, get comment text.
-    List<String> comments = new ArrayList<>();
+    // Iterate over all entities, get comment.
+    List<Comment> comments = new ArrayList<>();
     for (Entity entity : results.asIterable()) {
-      String commentText = (String) entity.getProperty("text");
-      comments.add(commentText);
+      String text = (String) entity.getProperty("text");
+      Date date = (Date) entity.getProperty("date");
+      Comment comment = new Comment(text, date);
+      comments.add(comment);
     }
 
     // Return comments in JSON format.
     response.setContentType("application/json;");
-    String json = convertToJsonUsingGson(comments);
+    String json = convertToJson(comments);
     response.getWriter().println(json);
   }
 
@@ -66,12 +69,12 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html;");
     String comment = getParameter(request, "text-input", "");
-    long timestamp = System.currentTimeMillis();
+    Date date = new Date();
 
     // Create a comment entity.
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("text", comment);
-    commentEntity.setProperty("timestamp", timestamp);
+    commentEntity.setProperty("date", date);
 
     // Add the comment entity to the DatastoreService.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -92,4 +95,18 @@ public class DataServlet extends HttpServlet {
     }
     return value;
   }
+
+  /**
+   * Inner class for Comments.
+   */
+  class Comment {
+    private String text;
+    private Date date;
+
+    public Comment(String text, Date date) {
+      this.text = text;
+      this.date = date;
+    }
+  }
+
 }
