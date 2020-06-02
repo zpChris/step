@@ -108,7 +108,6 @@ $(document).ready(() => {
  */
 function addComments() {
   fetch('/data').then(response => response.json()).then((messages) => {
-    console.log("This is a test.");
     const commentContainer = document.getElementById('comment-container');
     messages.forEach((message) => {
       commentContainer.append(createListElement(message));
