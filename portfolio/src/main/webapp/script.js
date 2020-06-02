@@ -110,7 +110,7 @@ $(document).ready(() => {
  */
 function addComments() {
   console.log("Hello!");
-  fetch('/data').then(response => response.json()).then((comments) => {
+  fetch('/data?limit=2').then(response => response.json()).then((comments) => {
     console.log(comments);
     const commentContainer = document.getElementById('comment-container');
     comments.forEach((comment) => {

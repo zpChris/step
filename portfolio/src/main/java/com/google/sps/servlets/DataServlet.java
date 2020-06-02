@@ -50,13 +50,24 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
+    // Extract limit on number of comments from query string.
+    Integer limit = Integer.parseInt(request.getParameter("limit"));
+
     // Iterate over all entities, get comment.
     List<Comment> comments = new ArrayList<>();
+    Integer count = 0;
     for (Entity entity : results.asIterable()) {
+      // Build the comment.
       String text = (String) entity.getProperty("text");
       Date date = (Date) entity.getProperty("date");
       Comment comment = new Comment(text, date);
       comments.add(comment);
+
+      // Update count, and stop adding comments if limit is reached.
+      count++;
+      if (limit == count) {
+        break;
+      }
     }
 
     // Return comments in JSON format.
