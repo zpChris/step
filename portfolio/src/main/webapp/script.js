@@ -102,3 +102,22 @@ $(document).ready(() => {
     fadeDiv('.project');
   });
 });
+
+/**
+ * Adds comments to the page.
+ */
+function addComments() {
+  fetch('/data').then(response => response.json()).then((messages) => {
+    const commentContainer = document.getElementById('comment-container');
+    messages.forEach((message) => {
+      commentContainer.append(createListElement(message));
+    });
+  });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
+}
