@@ -67,7 +67,8 @@ public class DataServlet extends HttpServlet {
       // Build the comment.
       String text = (String) entity.getProperty("text");
       Date date = (Date) entity.getProperty("date");
-      Comment comment = new Comment(text, date);
+      long id = entity.getKey().getId();
+      Comment comment = new Comment(id, text, date);
       comments.add(comment);
 
       // Update count, and stop adding comments if comment max limit is reached.
@@ -140,10 +141,12 @@ public class DataServlet extends HttpServlet {
    * Inner class for Comments.
    */
   class Comment {
+    private long id;
     private String text;
     private Date date;
 
-    public Comment(String text, Date date) {
+    public Comment(long id, String text, Date date) {
+      this.id = id;
       this.text = text;
       this.date = date;
     }

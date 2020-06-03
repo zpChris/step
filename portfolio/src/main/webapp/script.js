@@ -114,7 +114,7 @@ function addComments() {
     console.log(comments);
     const commentContainer = document.getElementById('comment-container');
     comments.forEach((comment) => {
-      commentContainer.append(createListElement(comment));
+      commentContainer.append(createComment(comment));
     });
   });
 }
@@ -122,11 +122,44 @@ function addComments() {
 /** 
  * Creates an <li> element containing text. 
  */
-function createListElement(comment) {
-  const liElement = document.createElement('li');
-  liElement.innerText = "Text: " + comment.text;
-  liElement.innerText += "\nTime: " + comment.date + " UTC";
-  return liElement;
+function createComment(comment) {
+  const commentElement = document.createElement('li');
+
+  // Create span element holding text.
+  const textElement = document.createElement('span');
+  textElement.innerText = comment.text;
+  textElement.className = 'span-comment';
+
+  // Create span element holding the Date.
+  const dateElement = document.createElement('span');
+  dateElement.innerText = comment.date + " UTC";
+  dateElement.className = 'span-comment span-comment-date';
+
+  // Create a delete button that triggers another function.
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment);
+
+    // Remove the task from the DOM.
+    commentElement.remove();
+  });
+  deleteButtonElement.className = 'span-comment';
+
+  // Add the text, date, and delete button to the comment.
+  commentElement.appendChild(textElement);
+  commentElement.appendChild(dateElement);
+  commentElement.appendChild(deleteButtonElement);
+  return commentElement;
+}
+
+/**
+ * Delete a comment, remove it from datastore.
+ */
+function deleteComment(comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-data', {method: 'POST', body: params});
 }
 
 /**
