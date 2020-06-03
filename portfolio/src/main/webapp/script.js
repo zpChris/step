@@ -103,17 +103,21 @@ $(document).ready(() => {
   });
 });
 
-/**
- * Adds a greeting to the page.
+/*
+ * Adds comments to the page.
  */
-function addGreeting() {
-  fetch('/data').then(response => response.text()).then((greeting) => {
-    // Convert the HTML string into a document object
-	  let parser = new DOMParser();
-	  let greetingObject = parser.parseFromString(greeting, 'text/html');
-
-    // Add H1 greeting object to HTML page
-    let greetingContainer = document.getElementById('greeting-container');
-    greetingContainer.append(greetingObject.documentElement);
+function addComments() {
+  fetch('/data').then(response => response.json()).then((messages) => {
+    const commentContainer = document.getElementById('comment-container');
+    messages.forEach((message) => {
+      commentContainer.append(createListElement(message));
+    });
   });
+}
+
+/** Creates an <li> element containing text. */
+function createListElement(text) {
+  const liElement = document.createElement('li');
+  liElement.innerText = text;
+  return liElement;
 }
