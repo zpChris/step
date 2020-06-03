@@ -32,9 +32,6 @@ public class DataServlet extends HttpServlet {
   @Override
   public void init() {
     comments = new ArrayList<String>();
-    comments.add("This is the first comment.");
-    comments.add("The second comment is right here.");
-    comments.add("The third comment has arrived.");
   }
 
    /**
@@ -51,5 +48,27 @@ public class DataServlet extends HttpServlet {
     response.setContentType("text/html;");
     String json = convertToJsonUsingGson(comments);
     response.getWriter().println(json);
+  }
+
+  @Override
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    response.setContentType("text/html;");
+    String comment = getParameter(request, "text-input", "");
+    comments.add(comment);
+
+    // Redirect back to the HTML page.
+    response.sendRedirect("/");
+  }
+
+  /**
+   * @return the request parameter, or the default value if the parameter
+   *         was not specified by the client
+   */
+  private String getParameter(HttpServletRequest request, String name, String defaultValue) {
+    String value = request.getParameter(name);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 }

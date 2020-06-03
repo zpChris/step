@@ -87,6 +87,8 @@ function fadeDiv(classOrIdName) {
 // Triggered upon DOM load.
 $(document).ready(() => {
   fadeDiv('.project');
+  disablePostComment();
+
   // Event every time user scrolls.
   $(window).scroll(() => {
     fadeDiv('.project');
@@ -115,9 +117,30 @@ function addComments() {
   });
 }
 
-/** Creates an <li> element containing text. */
+/** 
+ * Creates an <li> element containing text. 
+ */
 function createListElement(text) {
   const liElement = document.createElement('li');
   liElement.innerText = text;
   return liElement;
+}
+
+/**
+ * Disables the "submit" comment button by default.
+ */
+function disablePostComment() {
+  document.getElementById('comment-submit').disabled = true;
+}
+
+/**
+ * Check if the comment box has text; if so, enable "submit" button.
+ */
+function checkPostComment() {
+  let commentText = document.getElementById('comment-box').value;
+  if (commentText === '') {
+    document.getElementById('comment-submit').disabled = true;
+  } else {
+    document.getElementById('comment-submit').disabled = false;
+  }
 }
