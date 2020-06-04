@@ -35,8 +35,8 @@ import java.util.Date;
 public class DataServlet extends HttpServlet {
 
   // String identifiers for comment attributes.
-  const commentText = "text";
-  const commentDate = "date";
+  final String COMMENT_TEXT = "text";
+  final String COMMENT_DATE = "date";
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -50,7 +50,7 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort(commentDate, SortDirection.DESCENDING);
+    Query query = new Query("Comment").addSort(COMMENT_DATE, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
@@ -59,12 +59,26 @@ public class DataServlet extends HttpServlet {
       5 : Integer.parseInt(request.getParameter("limit"));
 
     // Iterate over all entities, get comment.
-    List<Comment> comments = new ArrayList<>();
+    List<Comment> comments = getComments(results, limit);
+
+    // Return comments in JSON format.
+    response.setContentType("application/json;");
+    String json = convertToJson(comments);
+    response.getWriter().println(json);
+  }
+
+  /**
+   * Get the comments from the datastore based on query in GET method.
+   */
+  public List<Comment> getComments(PreparedQuery results, int limit) {
+    List<Comment> comments = new ArrayList<Comment>();
+
+    // Populate comment list until limit is reached or no comments remain.
     int count = 0;
     for (Entity entity : results.asIterable()) {
       // Build the comment.
-      String text = (String) entity.getProperty(commentText);
-      Date date = (Date) entity.getProperty(commentDate);
+      String text = (String) entity.getProperty(COMMENT_TEXT);
+      Date date = (Date) entity.getProperty(COMMENT_DATE);
       Comment comment = new Comment(text, date);
       comments.add(comment);
 
@@ -75,10 +89,7 @@ public class DataServlet extends HttpServlet {
       }
     }
 
-    // Return comments in JSON format.
-    response.setContentType("application/json;");
-    String json = convertToJson(comments);
-    response.getWriter().println(json);
+    return comments;
   }
 
   @Override
@@ -127,8 +138,8 @@ public class DataServlet extends HttpServlet {
     public Entity createCommentEntity() {
       // Create a comment entity.
       Entity commentEntity = new Entity("Comment");
-      commentEntity.setProperty(commentText, this.text);
-      commentEntity.setProperty(commentDate, this.date);
+      commentEntity.setProperty(COMMENT_TEXT, this.text);
+      commentEntity.setProperty(COMMENT_DATE, this.date);
       return commentEntity;
     }
   }
