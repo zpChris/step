@@ -109,9 +109,7 @@ $(document).ready(() => {
  * Adds comments to the page.
  */
 function addComments() {
-  console.log("Hello!");
   fetch('/data?limit=2').then(response => response.json()).then((comments) => {
-    console.log(comments);
     const commentContainer = document.getElementById('comment-container');
     comments.forEach((comment) => {
       commentContainer.append(createListElement(comment));
