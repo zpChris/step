@@ -34,6 +34,10 @@ import java.util.Date;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
+  // String identifiers for comment attributes.
+  const commentText = "text";
+  const commentDate = "date";
+
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
    */
@@ -46,7 +50,7 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
+    Query query = new Query("Comment").addSort(commentDate, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
@@ -56,11 +60,11 @@ public class DataServlet extends HttpServlet {
 
     // Iterate over all entities, get comment.
     List<Comment> comments = new ArrayList<>();
-    Integer count = 0;
+    int count = 0;
     for (Entity entity : results.asIterable()) {
       // Build the comment.
-      String text = (String) entity.getProperty("text");
-      Date date = (Date) entity.getProperty("date");
+      String text = (String) entity.getProperty(commentText);
+      Date date = (Date) entity.getProperty(commentDate);
       Comment comment = new Comment(text, date);
       comments.add(comment);
 
@@ -123,8 +127,8 @@ public class DataServlet extends HttpServlet {
     public Entity createCommentEntity() {
       // Create a comment entity.
       Entity commentEntity = new Entity("Comment");
-      commentEntity.setProperty("text", this.text);
-      commentEntity.setProperty("date", this.date);
+      commentEntity.setProperty(commentText, this.text);
+      commentEntity.setProperty(commentDate, this.date);
       return commentEntity;
     }
   }
