@@ -79,13 +79,12 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html;");
-    String comment = getParameter(request, "text-input", "");
+    String text = getParameter(request, "text-input", "");
     Date date = new Date();
 
-    // Create a comment entity.
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("text", comment);
-    commentEntity.setProperty("date", date);
+    // Create a comment entity from the Comment object.
+    Comment commentObject = new Comment(text, date);
+    Entity commentEntity = commentObject.createCommentEntity();
 
     // Add the comment entity to the DatastoreService.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -108,15 +107,24 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * Inner class for Comments.
+   * Inner class for the Comments posted by users on the portfolio site.
    */
   class Comment {
+    // The fields that hold the relevant comment data.
     private String text;
     private Date date;
 
     public Comment(String text, Date date) {
       this.text = text;
       this.date = date;
+    }
+
+    public Entity createCommentEntity() {
+      // Create a comment entity.
+      Entity commentEntity = new Entity("Comment");
+      commentEntity.setProperty("text", this.text);
+      commentEntity.setProperty("date", this.date);
+      return commentEntity;
     }
   }
 
