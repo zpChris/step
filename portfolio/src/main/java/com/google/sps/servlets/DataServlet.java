@@ -50,8 +50,9 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    // Extract limit on number of comments from query string.
-    Integer limit = Integer.parseInt(request.getParameter("limit"));
+    // Extract limit on number of comments from query string (default is 5).
+    int limit = (request.getParameter("limit") == null) ?
+      5 : Integer.parseInt(request.getParameter("limit"));
 
     // Iterate over all entities, get comment.
     List<Comment> comments = new ArrayList<>();
