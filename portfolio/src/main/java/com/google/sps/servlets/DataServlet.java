@@ -40,7 +40,7 @@ public class DataServlet extends HttpServlet {
   final String COMMENT_NAME = "Comment";
 
   // Default for max number of comments to show.
-  final int COMMENT_MAX = 5;
+  final int COMMENT_MAX_DEFAULT = 5;
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -61,7 +61,7 @@ public class DataServlet extends HttpServlet {
     // Extract limit on number of comments from query string (default is 5).
     int limit = (request.getParameter("limit") == null) ?
       
-      COMMENT_MAX : Integer.parseInt(request.getParameter("limit"));
+      COMMENT_MAX_DEFAULT : Integer.parseInt(request.getParameter("limit"));
 
     // Iterate over all entities, get comment.
     List<Comment> comments = getComments(results, limit);
