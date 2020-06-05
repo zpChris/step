@@ -122,6 +122,7 @@ function addComments() {
  */
 function createComment(comment) {
   const commentElement = document.createElement('li');
+  commentElement.className = 'comment-element';
 
   // Create span element holding text.
   const textElement = document.createElement('span');
@@ -177,4 +178,16 @@ function checkPostComment() {
   } else {
     document.getElementById('comment-submit').disabled = false;
   }
+}
+
+/**
+ * Deletes all comments presently in datastore.
+ */
+function deleteAllComments() {
+  // Remove all comments from frontend?
+  const commentElements = document.getElementsByClassName("comment-element");
+  Array.prototype.forEach.call(commentElements, (commentElement) => {
+    commentElement.style.display = 'none';
+  });
+  fetch('/delete-data', {method: 'POST'});
 }

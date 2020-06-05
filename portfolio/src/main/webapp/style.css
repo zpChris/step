@@ -93,3 +93,7 @@ li {
   font-style: italic;
   color: rgb(160, 160, 160);
 }
+
+form {
+  margin: 10px 0;
+}
