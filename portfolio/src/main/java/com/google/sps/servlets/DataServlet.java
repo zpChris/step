@@ -84,7 +84,7 @@ public class DataServlet extends HttpServlet {
 
       // Update count, and stop adding comments if limit is reached.
       count++;
-      if (limit == count) {
+      if (limit <= count) {
         break;
       }
     }
