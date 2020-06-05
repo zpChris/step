@@ -28,15 +28,24 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that handles comment data. */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
+  // String identifiers for comment attributes.
+  final String COMMENT_TEXT = "text";
+  final String COMMENT_DATE = "date";
+  final String COMMENT_NAME = "Comment";
+
+  // Default for max number of comments to show.
+  final int COMMENT_MAX_DEFAULT = 5;
+
    /**
-   * Converts a List of messages into a JSON string using the Gson library.
+   * Converts a List of Comments into a JSON string using the Gson library.
    */
-  private String convertToJsonUsingGson(List<String> messages) {
+  private String convertToJson(List<Comment> messages) {
     Gson gson = new Gson();
     String json = gson.toJson(messages);
     return json;
@@ -45,33 +54,59 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+    Query query = new Query(COMMENT_NAME).addSort(COMMENT_DATE, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    // Iterate over all entities, get comment text.
-    List<String> comments = new ArrayList<>();
-    for (Entity entity : results.asIterable()) {
-      String commentText = (String) entity.getProperty("text");
-      comments.add(commentText);
-    }
+    // Extract limit on number of comments from query string (default is 5).
+    int limit = (request.getParameter("limit") == null) ?
+      
+      COMMENT_MAX_DEFAULT : Integer.parseInt(request.getParameter("limit"));
+
+    // Iterate over all entities, get comment.
+    List<Comment> comments = getComments(results, limit);
 
     // Return comments in JSON format.
     response.setContentType("application/json;");
-    String json = convertToJsonUsingGson(comments);
+    String json = convertToJson(comments);
     response.getWriter().println(json);
+  }
+
+  /**
+   * Get all Comment entities from the provided PreparedQuery. 
+   * No more comments than the provided limit allows will be returned.
+   */
+  public List<Comment> getComments(PreparedQuery results, int limit) {
+    List<Comment> comments = new ArrayList<Comment>();
+
+    // Populate comment list until limit is reached or no comments remain.
+    int count = 0;
+    for (Entity entity : results.asIterable()) {
+      // Build the comment.
+      String text = (String) entity.getProperty(COMMENT_TEXT);
+      Date date = (Date) entity.getProperty(COMMENT_DATE);
+      Comment comment = new Comment(text, date);
+      comments.add(comment);
+
+      // Update count, and stop adding comments if limit is reached.
+      count++;
+      if (limit <= count) {
+        return comments;
+      }
+    }
+
+    return comments;
   }
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("text/html;");
-    String comment = getParameter(request, "text-input", "");
-    long timestamp = System.currentTimeMillis();
+    String text = getParameter(request, "text-input", "");
+    Date date = new Date();
 
-    // Create a comment entity.
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("text", comment);
-    commentEntity.setProperty("timestamp", timestamp);
+    // Create a comment entity from the Comment object.
+    Comment commentObject = new Comment(text, date);
+    Entity commentEntity = commentObject.createCommentEntity();
 
     // Add the comment entity to the DatastoreService.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -92,4 +127,27 @@ public class DataServlet extends HttpServlet {
     }
     return value;
   }
+
+  /**
+   * Inner class for the Comments posted by users on the portfolio site.
+   */
+  class Comment {
+    // The fields that hold the relevant comment data.
+    private String text;
+    private Date date;
+
+    public Comment(String text, Date date) {
+      this.text = text;
+      this.date = date;
+    }
+
+    public Entity createCommentEntity() {
+      // Create a comment entity.
+      Entity commentEntity = new Entity(COMMENT_NAME);
+      commentEntity.setProperty(COMMENT_TEXT, this.text);
+      commentEntity.setProperty(COMMENT_DATE, this.date);
+      return commentEntity;
+    }
+  }
+
 }
