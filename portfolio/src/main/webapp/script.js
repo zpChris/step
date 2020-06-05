@@ -184,10 +184,11 @@ function checkPostComment() {
  * Deletes all comments presently in datastore.
  */
 function deleteAllComments() {
-  // Remove all comments from frontend?
+  // Hide all comments from the frontend.
   const commentElements = document.getElementsByClassName("comment-element");
   Array.prototype.forEach.call(commentElements, (commentElement) => {
     commentElement.style.display = 'none';
   });
+  // Delete all the comments in datastore.
   fetch('/delete-data', {method: 'POST'});
 }
