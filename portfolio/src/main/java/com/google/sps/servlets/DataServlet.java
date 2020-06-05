@@ -37,6 +37,10 @@ public class DataServlet extends HttpServlet {
   // String identifiers for comment attributes.
   final String COMMENT_TEXT = "text";
   final String COMMENT_DATE = "date";
+  final String COMMENT_NAME = "Comment";
+
+  // Default for max number of comments to show.
+  final int COMMENT_MAX = 5;
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -50,13 +54,14 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort(COMMENT_DATE, SortDirection.DESCENDING);
+    Query query = new Query(COMMENT_NAME).addSort(COMMENT_DATE, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     // Extract limit on number of comments from query string (default is 5).
     int limit = (request.getParameter("limit") == null) ?
-      5 : Integer.parseInt(request.getParameter("limit"));
+      
+      COMMENT_MAX : Integer.parseInt(request.getParameter("limit"));
 
     // Iterate over all entities, get comment.
     List<Comment> comments = getComments(results, limit);
@@ -68,7 +73,8 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * Get the comments from the datastore based on query in GET method.
+   * Get all Comment entities from the provided PreparedQuery. 
+   * No more comments than the provided limit allows will be returned.
    */
   public List<Comment> getComments(PreparedQuery results, int limit) {
     List<Comment> comments = new ArrayList<Comment>();
@@ -85,7 +91,7 @@ public class DataServlet extends HttpServlet {
       // Update count, and stop adding comments if limit is reached.
       count++;
       if (limit <= count) {
-        break;
+        return comments;
       }
     }
 
@@ -137,7 +143,7 @@ public class DataServlet extends HttpServlet {
 
     public Entity createCommentEntity() {
       // Create a comment entity.
-      Entity commentEntity = new Entity("Comment");
+      Entity commentEntity = new Entity(COMMENT_NAME);
       commentEntity.setProperty(COMMENT_TEXT, this.text);
       commentEntity.setProperty(COMMENT_DATE, this.date);
       return commentEntity;
