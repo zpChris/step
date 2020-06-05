@@ -34,12 +34,18 @@ import java.util.Date;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
-  Integer commentMax;
+  // String identifiers for comment attributes.
+  final String COMMENT_TEXT = "text";
+  final String COMMENT_DATE = "date";
+
+  // Maximum number of comments that are shown in UI.
+  int commentMax;
 
   @Override
   public void init() {
     this.commentMax = 5;
   }
+  
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -53,35 +59,47 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query("Comment").addSort("date", SortDirection.DESCENDING);
+    Query query = new Query("Comment").addSort(COMMENT_DATE, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
-    // Extract comment max limit on number of comments from query string.
-    Integer commentMax = Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
+    // Extract limit on number of comments from query string (default is 5).
+    Integer commentMax = 
+      Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
 
     // Iterate over all entities, get comment.
-    List<Comment> comments = new ArrayList<>();
-    Integer count = 0;
+    List<Comment> comments = getComments(results, commentMax);
+
+    // Return comments in JSON format.
+    response.setContentType("application/json;");
+    String json = convertToJson(comments);
+    response.getWriter().println(json);
+  }
+
+  /**
+   * Get the comments from the datastore based on query in GET method.
+   */
+  public List<Comment> getComments(PreparedQuery results, int commentMax) {
+    List<Comment> comments = new ArrayList<Comment>();
+
+    // Populate comment list until limit is reached or no comments remain.
+    int count = 0;
     for (Entity entity : results.asIterable()) {
       // Build the comment.
-      String text = (String) entity.getProperty("text");
-      Date date = (Date) entity.getProperty("date");
+      String text = (String) entity.getProperty(COMMENT_TEXT);
+      Date date = (Date) entity.getProperty(COMMENT_DATE);
       long id = entity.getKey().getId();
       Comment comment = new Comment(id, text, date);
       comments.add(comment);
 
       // Update count, and stop adding comments if comment max limit is reached.
       count++;
-      if (commentMax == count) {
+      if (commentMax <= count) {
         break;
       }
     }
 
-    // Return comments in JSON format.
-    response.setContentType("application/json;");
-    String json = convertToJson(comments);
-    response.getWriter().println(json);
+    return comments;
   }
 
   @Override
@@ -99,13 +117,12 @@ public class DataServlet extends HttpServlet {
    * Handle logic of posting comment and redirecting user to original page.
    */
   public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String comment = getParameter(request, "text-input", "");
+    String text = getParameter(request, "text-input", "");
     Date date = new Date();
 
-    // Create a comment entity.
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("text", comment);
-    commentEntity.setProperty("date", date);
+    // Create a comment entity from the Comment object.
+    Comment commentObject = new Comment(text, date);
+    Entity commentEntity = commentObject.createCommentEntity();
 
     // Add the comment entity to the DatastoreService.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -138,17 +155,33 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * Inner class for Comments.
+   * Inner class for the Comments posted by users on the portfolio site.
    */
   class Comment {
+    // The fields that hold the relevant comment data.
     private long id;
     private String text;
     private Date date;
 
+    // No ID is required when creating Comment Entity.
+    public Comment(String text, Date date) {
+      this.text = text;
+      this.date = date;
+    }
+
+    // ID is required when creating Comment object for frontend.
     public Comment(long id, String text, Date date) {
       this.id = id;
       this.text = text;
       this.date = date;
+    }
+
+    public Entity createCommentEntity() {
+      // Create a comment entity.
+      Entity commentEntity = new Entity("Comment");
+      commentEntity.setProperty(COMMENT_TEXT, this.text);
+      commentEntity.setProperty(COMMENT_DATE, this.date);
+      return commentEntity;
     }
   }
 

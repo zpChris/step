@@ -105,7 +105,7 @@ $(document).ready(() => {
   });
 });
 
-/**
+/*
  * Adds comments to the page.
  */
 function addComments() {
