@@ -84,3 +84,7 @@ li {
   padding: 5px;
   margin: 5px 0;
 }
+
+#auth-container {
+  border: 1px solid black;
+}

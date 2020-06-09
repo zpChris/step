@@ -86,6 +86,11 @@ function fadeDiv(classOrIdName) {
 
 // Triggered upon DOM load.
 $(document).ready(() => {
+  // Add servlet information to frontend.
+  addComments();
+  addAuth();
+
+  // Add frontend styling.
   fadeDiv('.project');
   disablePostComment();
 
@@ -144,4 +149,20 @@ function checkPostComment() {
   } else {
     document.getElementById('comment-submit').disabled = false;
   }
+}
+
+/**
+ * Add the user login/logout status to page, along with email (if applicable).
+ * Provides options to login and logout.
+ */
+function addAuth() {
+  fetch('/auth').then(response => response.text()).then((authText) => {
+    // Parse text to HTML.
+    let parser = new DOMParser();
+    let authHtml = parser.parseFromString(authText, 'text/html');
+    
+    // Add authHtml to the auth-container div.
+    let authContainerDiv = document.getElementById('auth-container');
+    authContainerDiv.append(authHtml.documentElement);
+  });
 }
