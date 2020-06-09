@@ -223,7 +223,3 @@ function addAuth() {
 
   });
 }
-
-function buildAuthObjects(authObj) {
-
-}
