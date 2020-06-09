@@ -194,13 +194,11 @@ function checkSubmit(inputElementId, submitElementId) {
  * Provides options to login and logout.
  */
 function addAuth() {
-  fetch('/auth').then(response => response.text()).then((authText) => {
-    // Parse text to HTML.
-    let parser = new DOMParser();
-    let authHtml = parser.parseFromString(authText, 'text/html');
+  fetch('/auth').then(response => response.json()).then((authObj) => {
+    console.log("Hello!");
+    console.log(authObj);
     
     // Add authHtml to the auth-container div.
     let authContainerDiv = document.getElementById('auth-container');
-    authContainerDiv.append(authHtml.documentElement);
   });
 }
