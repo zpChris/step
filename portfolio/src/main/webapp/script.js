@@ -197,8 +197,6 @@ function addAuth() {
   fetch('/auth').then(response => response.json()).then((authObj) => {
     let authContainerDiv = document.getElementById('auth-container');
 
-    console.log(authObj);
-
     // Dynamically construct auth information based on user login status.
     if (authObj.loggedIn) {
       // Create paragraph element holding the email.
