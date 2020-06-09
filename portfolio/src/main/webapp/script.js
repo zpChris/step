@@ -109,7 +109,8 @@ $(document).ready(() => {
 });
 
 /*
- * Adds comments to the page.
+ * Fetches comment data from server (limiting comments to the 'comment max'),
+ * builds, styles, and displays comments on the frontend.
  */
 function addComments() {
   fetch('/data').then(response => response.json()).then((comments) => {
@@ -121,7 +122,7 @@ function addComments() {
 }
 
 /** 
- * Creates an <li> element containing text. 
+ * Creates an <li> element containing text, date posted, and a delete button.
  */
 function createComment(comment) {
   const commentElement = document.createElement('li');
