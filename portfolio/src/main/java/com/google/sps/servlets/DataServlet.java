@@ -43,13 +43,12 @@ public class DataServlet extends HttpServlet {
   final int COMMENT_MAX_DEFAULT = 5;
 
   // Maximum number of comments that are shown in UI.
-  int commentMax;
+  private int commentMax;
 
   @Override
   public void init() {
     this.commentMax = COMMENT_MAX_DEFAULT;
   }
-  
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -69,7 +68,7 @@ public class DataServlet extends HttpServlet {
     PreparedQuery results = datastore.prepare(query);
 
     // Extract limit on number of comments from query string (default is 5).
-    Integer commentMax = 
+    int commentMax = 
       Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
 
     // Iterate over all entities, get comment.
@@ -165,18 +164,21 @@ public class DataServlet extends HttpServlet {
    * Inner class for the Comments posted by users on the portfolio site.
    */
   class Comment {
-    // The fields that hold the relevant comment data.
+    // The ID is not required for creating a Comment Entity.
+    // The default ID of "0" means the Comment object is used to make an Entity.
+    // Otherwise, the ID is an Entity property necessary to delete the Comment. 
     private long id;
+
+    // The fields that hold the relevant comment data.
     private String text;
     private Date date;
 
-    // No ID is required when creating Comment Entity.
+    // This constructor can create a Comment Entity (no ID required).
     public Comment(String text, Date date) {
-      this.text = text;
-      this.date = date;
+      this(0, text, date);
     }
 
-    // ID is required when creating Comment object for frontend.
+    // This constructor can accept a Comment Entity object (includes ID).
     public Comment(long id, String text, Date date) {
       this.id = id;
       this.text = text;
