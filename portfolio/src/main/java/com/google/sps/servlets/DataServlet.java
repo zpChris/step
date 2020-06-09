@@ -50,9 +50,9 @@ public class DataServlet extends HttpServlet {
     this.commentMax = COMMENT_MAX_DEFAULT;
   }
 
-   /**
-   * Converts a List of Comments into a JSON string using the Gson library.
-   */
+  /**
+  * Converts a List of Comments into a JSON string using the Gson library.
+  */
   private String convertToJson(List<Comment> messages) {
     Gson gson = new Gson();
     String json = gson.toJson(messages);

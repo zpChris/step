@@ -194,13 +194,38 @@ function checkSubmit(inputElementId, submitElementId) {
  * Provides options to login and logout.
  */
 function addAuth() {
-  fetch('/auth').then(response => response.text()).then((authText) => {
-    // Parse text to HTML.
-    let parser = new DOMParser();
-    let authHtml = parser.parseFromString(authText, 'text/html');
-    
-    // Add authHtml to the auth-container div.
+  fetch('/auth').then(response => response.json()).then((authObj) => {
     let authContainerDiv = document.getElementById('auth-container');
-    authContainerDiv.append(authHtml.documentElement);
+
+    console.log(authObj);
+
+    // Dynamically construct auth information based on user login status.
+    if (authObj.loggedIn) {
+      // Create paragraph element holding the email.
+      const displayEmail = document.createElement('p');
+      displayEmail.innerText = 'Email: ' + authObj.email;
+
+      // Create link element that allows users to log out.
+      const logoutLink = document.createElement('a');
+      logoutLink.innerText = 'Logout';
+      logoutLink.href = authObj.logoutUrl;
+
+      // Add the components to the auth-container div.
+      authContainerDiv.append(displayEmail);
+      authContainerDiv.append(logoutLink);
+    } else {
+      // Create link element that allows users to log in.
+      const loginLink = document.createElement('a');
+      loginLink.innerText = 'Login';
+      loginLink.href = authObj.loginUrl;
+      
+      // Add the login link to the auth-container div.
+      authContainerDiv.append(loginLink);
+    }
+
   });
+}
+
+function buildAuthObjects(authObj) {
+
 }

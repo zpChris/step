@@ -21,29 +21,73 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.google.gson.Gson;
 
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html");
+    response.setContentType("application/json");
 
     UserService userService = UserServiceFactory.getUserService();
+    UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
-      // Display user email and log out option.
       String userEmail = userService.getCurrentUser().getEmail();
       String urlToRedirectToAfterUserLogsOut = "/";
       String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
-      response.getWriter().println("<p>Hello " + userEmail + "!</p>");
-      response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
+      // Create UserAuth object to represent logged-in user.
+      userAuth = new UserAuth(logoutUrl, userEmail);
     } else {
-      // Allow user to log in.
       String urlToRedirectToAfterUserLogsIn = "/";
       String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
-      response.getWriter().println("<p>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
+      // Create UserAuth object to represent logged-out user.
+      userAuth = new UserAuth(loginUrl);
+    }
+
+    String json = convertToJson(userAuth);
+    response.getWriter().println(json);
+  }
+
+  /**
+  * Converts a UserAuth object into a JSON string using the Gson library.
+  */
+  private String convertToJson(UserAuth userAuth) {
+    Gson gson = new Gson();
+    String json = gson.toJson(userAuth);
+    return json;
+  }
+
+  /**
+   * Inner class that holds relevant login/logout and user information.
+   */
+  class UserAuth {
+    // Fields that hold relevant login data.
+    private boolean loggedIn;
+    private String loginUrl;
+    private String logoutUrl;
+    private String email;
+
+    // Constructor to create UserAuth object with no user logged in.
+    // Empty strings represent no value (null is avoided).
+    public UserAuth(String loginUrl) {
+      this(false, loginUrl, "", "");
+    }
+
+    // Constructor to create UserAuth object with user logged in.
+    public UserAuth(String logoutUrl, String email) {
+      this(true, "", logoutUrl, email);
+    }
+
+    // Full constructor to assign values to all fields.
+    public UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
+      String email) {
+        this.loggedIn = loggedIn;
+        this.loginUrl = loginUrl;
+        this.logoutUrl = logoutUrl;
+        this.email = email;
     }
   }
 }
