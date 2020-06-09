@@ -93,7 +93,7 @@ $(document).ready(() => {
     if (loggedIn) {
       addComments();
     } else {
-      addCommentLoginInstruction();
+      hideComments();
     }
   });
 
@@ -184,11 +184,11 @@ function disableSubmit(elementId) {
 }
 
 /**
- * Add a text element that instructs the user to log in to view comments.
+ * Hide the comment section from the user.
  */
-function addCommentLoginInstruction() {
-  const commentContainer = document.getElementById('comment-container');
-  commentContainer.innerText = 'Please log in to view the comments.';
+function hideComments() {
+  const commentContainer = document.getElementById('comment-section-container');
+  commentContainer.style.display = 'none';
 }
 
 /**
