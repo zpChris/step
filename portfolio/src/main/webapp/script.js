@@ -87,7 +87,10 @@ function fadeDiv(classOrIdName) {
 // Triggered upon DOM load.
 $(document).ready(() => {
   fadeDiv('.project');
-  disablePostComment();
+
+  // Disable post comment and max comments shown submit buttons, by default.
+  disableSubmit('comment-submit');
+  disableSubmit('comment-max-submit');
 
   // Event every time user scrolls.
   $(window).scroll(() => {
@@ -161,20 +164,21 @@ function deleteComment(comment) {
 }
 
 /**
- * Disables the "submit" comment button by default.
+ * Disables the "submit" button of a particular element by default.
  */
-function disablePostComment() {
-  document.getElementById('comment-submit').disabled = true;
+function disableSubmit(elementId) {
+  document.getElementById(elementId).disabled = true;
 }
 
 /**
- * Check if the comment box has text; if so, enable "submit" button.
+ * Check if the correlated input element box has text; if so, enable the 
+ * "submit" button corresponding to that input element.
  */
-function checkPostComment() {
-  let commentText = document.getElementById('comment-box').value;
-  if (commentText === '') {
-    document.getElementById('comment-submit').disabled = true;
+function checkSubmit(inputElementId, submitElementId) {
+  let inputElement = document.getElementById(inputElementId).value;
+  if (inputElement === '') {
+    document.getElementById(submitElementId).disabled = true;
   } else {
-    document.getElementById('comment-submit').disabled = false;
+    document.getElementById(submitElementId).disabled = false;
   }
 }
