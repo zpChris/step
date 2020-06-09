@@ -92,7 +92,10 @@ $(document).ready(() => {
 
   // Add frontend styling.
   fadeDiv('.project');
-  disablePostComment();
+
+  // Disable post comment and max comments shown submit buttons, by default.
+  disableSubmit('comment-submit');
+  disableSubmit('comment-max-submit');
 
   // Event every time user scrolls.
   $(window).scroll(() => {
@@ -111,43 +114,78 @@ $(document).ready(() => {
 });
 
 /*
- * Adds comments to the page.
+ * Fetches comment data from server (limiting comments to the 'comment max'),
+ * builds, styles, and displays comments on the frontend.
  */
 function addComments() {
-  fetch('/data?limit=2').then(response => response.json()).then((comments) => {
+  fetch('/data').then(response => response.json()).then((comments) => {
     const commentContainer = document.getElementById('comment-container');
     comments.forEach((comment) => {
-      commentContainer.append(createListElement(comment));
+      commentContainer.append(createComment(comment));
     });
   });
 }
 
 /** 
- * Creates an <li> element containing text. 
+ * Creates an <li> element containing text, date posted, and a delete button.
  */
-function createListElement(comment) {
-  const liElement = document.createElement('li');
-  liElement.innerText = "Text: " + comment.text;
-  liElement.innerText += "\nTime: " + comment.date + " UTC";
-  return liElement;
+function createComment(comment) {
+  const commentElement = document.createElement('li');
+
+  // Create span element holding text.
+  const textElement = document.createElement('span');
+  textElement.innerText = comment.text;
+  textElement.className = 'span-comment';
+
+  // Create span element holding the Date.
+  const dateElement = document.createElement('span');
+  dateElement.innerText = comment.date + " UTC";
+  dateElement.className = 'span-comment span-comment-date';
+
+  // Create a delete button that triggers another function.
+  const deleteButtonElement = document.createElement('button');
+  deleteButtonElement.innerText = 'Delete';
+  deleteButtonElement.addEventListener('click', () => {
+    deleteComment(comment);
+
+    // Remove the task from the DOM.
+    commentElement.remove();
+  });
+  deleteButtonElement.className = 'span-comment';
+
+  // Add the text, date, and delete button to the comment.
+  commentElement.appendChild(textElement);
+  commentElement.appendChild(dateElement);
+  commentElement.appendChild(deleteButtonElement);
+  return commentElement;
 }
 
 /**
- * Disables the "submit" comment button by default.
+ * Delete a comment, remove it from datastore.
  */
-function disablePostComment() {
-  document.getElementById('comment-submit').disabled = true;
+function deleteComment(comment) {
+  const params = new URLSearchParams();
+  params.append('id', comment.id);
+  fetch('/delete-data', {method: 'POST', body: params});
 }
 
 /**
- * Check if the comment box has text; if so, enable "submit" button.
+ * Disables the "submit" button of a particular element by default.
  */
-function checkPostComment() {
-  let commentText = document.getElementById('comment-box').value;
-  if (commentText === '') {
-    document.getElementById('comment-submit').disabled = true;
+function disableSubmit(elementId) {
+  document.getElementById(elementId).disabled = true;
+}
+
+/**
+ * Check if the correlated input element box has text; if so, enable the 
+ * "submit" button corresponding to that input element.
+ */
+function checkSubmit(inputElementId, submitElementId) {
+  let inputElement = document.getElementById(inputElementId).value;
+  if (inputElement === '') {
+    document.getElementById(submitElementId).disabled = true;
   } else {
-    document.getElementById('comment-submit').disabled = false;
+    document.getElementById(submitElementId).disabled = false;
   }
 }
 

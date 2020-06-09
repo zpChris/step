@@ -88,3 +88,12 @@ li {
 #auth-container {
   border: 1px solid black;
 }
+
+.span-comment {
+  margin: 5px;
+}
+
+.span-comment-date {
+  font-style: italic;
+  color: rgb(160, 160, 160);
+}
