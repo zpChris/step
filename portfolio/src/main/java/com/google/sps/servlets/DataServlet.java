@@ -35,9 +35,10 @@ import java.util.Date;
 public class DataServlet extends HttpServlet {
 
   // String identifiers for comment attributes.
-  final String COMMENT_TEXT = "text";
-  final String COMMENT_DATE = "date";
-  final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_TEXT = "text";
+  public static final String COMMENT_DATE = "date";
+  public static final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_MAX = "comment-max";
 
   // Default for max number of comments to show.
   final int COMMENT_MAX_DEFAULT = 5;
@@ -85,7 +86,7 @@ public class DataServlet extends HttpServlet {
    * No more comments than the provided limit allows will be returned.
    */
   public List<Comment> getComments(PreparedQuery results, int commentMax) {
-    List<Comment> comments = new ArrayList<Comment>();
+    List<Comment> comments = new ArrayList<>();
 
     // Populate comment list until limit is reached or no comments remain.
     int count = 0;
@@ -113,7 +114,7 @@ public class DataServlet extends HttpServlet {
     // Separate POST logic for comments and max comments shown.
     if (request.getParameter("text-input") != null) {
       postComment(request, response);
-    } else if (request.getParameter("comment-max") != null) {
+    } else if (request.getParameter(COMMENT_MAX) != null) {
       setCommentMax(request, response);
     }
   }
@@ -141,8 +142,9 @@ public class DataServlet extends HttpServlet {
    * Set the max number of comments that can be shown (value between 1 and 50).
    */
   public void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     this.commentMax = 
-      Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
+      Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
 
     // Redirect back to the HTML page.
     response.sendRedirect("/");
