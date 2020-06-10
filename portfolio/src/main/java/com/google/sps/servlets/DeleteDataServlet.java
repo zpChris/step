@@ -61,11 +61,11 @@ public class DeleteDataServlet extends HttpServlet {
   public void deleteAllComments() {
     // Get the keys of all comment entities in datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("Comment");
+    Query query = new Query(DataServlet.COMMENT_NAME);
     PreparedQuery results = datastore.prepare(query);
 
     // Remove all comment entities by key from datastore.
-    List<Key> keys = new ArrayList<Key>();
+    List<Key> keys = new ArrayList<>();
     for(Entity commentEntity : results.asIterable()) {
       keys.add(commentEntity.getKey());
     } 

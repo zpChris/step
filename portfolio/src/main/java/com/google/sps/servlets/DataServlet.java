@@ -86,7 +86,7 @@ public class DataServlet extends HttpServlet {
    * No more comments than the provided limit allows will be returned.
    */
   public List<Comment> getComments(PreparedQuery results, int commentMax) {
-    List<Comment> comments = new ArrayList<Comment>();
+    List<Comment> comments = new ArrayList<>();
 
     // Populate comment list until limit is reached or no comments remain.
     int count = 0;
