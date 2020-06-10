@@ -40,14 +40,16 @@ public class DataServlet extends HttpServlet {
   public static final String COMMENT_NAME = "Comment";
   public static final String COMMENT_MAX = "comment-max";
 
+  // Default for max number of comments to show.
+  final int COMMENT_MAX_DEFAULT = 5;
+
   // Maximum number of comments that are shown in UI.
-  int commentMax;
+  private int commentMax;
 
   @Override
   public void init() {
-    this.commentMax = 5;
+    this.commentMax = COMMENT_MAX_DEFAULT;
   }
-  
 
    /**
    * Converts a List of Comments into a JSON string using the Gson library.
@@ -61,13 +63,14 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Get comments in datastore, by most recent order at the top.
-    Query query = new Query(COMMENT_NAME).addSort(COMMENT_DATE, SortDirection.DESCENDING);
+    Query query = new Query(COMMENT_NAME)
+      .addSort(COMMENT_DATE, SortDirection.DESCENDING);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     // Extract limit on number of comments from query string (default is 5).
-    Integer commentMax = 
-      Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
+    int commentMax = 
+      Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
 
     // Iterate over all entities, get comment.
     List<Comment> comments = getComments(results, commentMax);
@@ -79,7 +82,8 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
-   * Get the comments from the datastore based on query in GET method.
+   * Get all Comment entities from the provided PreparedQuery. 
+   * No more comments than the provided limit allows will be returned.
    */
   public List<Comment> getComments(PreparedQuery results, int commentMax) {
     List<Comment> comments = new ArrayList<Comment>();
@@ -97,7 +101,7 @@ public class DataServlet extends HttpServlet {
       // Update count, and stop adding comments if comment max limit is reached.
       count++;
       if (commentMax <= count) {
-        break;
+        return comments;
       }
     }
 
@@ -138,7 +142,9 @@ public class DataServlet extends HttpServlet {
    * Set the max number of comments that can be shown (value between 1 and 50).
    */
   public void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    this.commentMax = Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
+
+    this.commentMax = 
+      Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
 
     // Redirect back to the HTML page.
     response.sendRedirect("/");
@@ -160,18 +166,21 @@ public class DataServlet extends HttpServlet {
    * Inner class for the Comments posted by users on the portfolio site.
    */
   class Comment {
-    // The fields that hold the relevant comment data.
+    // The ID is not required for creating a Comment Entity.
+    // The default ID of "0" means the Comment object is used to make an Entity.
+    // Otherwise, the ID is an Entity property necessary to delete the Comment. 
     private long id;
+
+    // The fields that hold the relevant comment data.
     private String text;
     private Date date;
 
-    // No ID is required when creating Comment Entity.
+    // This constructor can create a Comment Entity (no ID required).
     public Comment(String text, Date date) {
-      this.text = text;
-      this.date = date;
+      this(0, text, date);
     }
 
-    // ID is required when creating Comment object for frontend.
+    // This constructor can accept a Comment Entity object (includes ID).
     public Comment(long id, String text, Date date) {
       this.id = id;
       this.text = text;
