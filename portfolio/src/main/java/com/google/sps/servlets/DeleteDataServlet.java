@@ -40,7 +40,7 @@ public class DeleteDataServlet extends HttpServlet {
     if (request.getParameter("id") != null) {
       deleteComment(request);
     } else {
-      deleteAllComments(request);
+      deleteAllComments();
     }
   }
 
@@ -50,7 +50,7 @@ public class DeleteDataServlet extends HttpServlet {
   public void deleteComment(HttpServletRequest request) {
     long id = Long.parseLong(request.getParameter("id"));
 
-    Key commentEntityKey = KeyFactory.createKey("Comment", id);
+    Key commentEntityKey = KeyFactory.createKey(DataServlet.COMMENT_NAME, id);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.delete(commentEntityKey);
   }
@@ -58,7 +58,7 @@ public class DeleteDataServlet extends HttpServlet {
   /**
    * Delete all comments present in datastore (called when no ID is passed in).
    */
-  public void deleteAllComments(HttpServletRequest request) {
+  public void deleteAllComments() {
     // Get the keys of all comment entities in datastore.
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query = new Query("Comment");
