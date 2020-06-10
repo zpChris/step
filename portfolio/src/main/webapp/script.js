@@ -126,6 +126,7 @@ $(document).ready(() => {
  */
 function addComments() {
   fetch('/data').then(response => response.json()).then((comments) => {
+    console.log(comments);
     const commentContainer = document.getElementById('comment-container');
     comments.forEach((comment) => {
       commentContainer.append(createComment(comment));
