@@ -22,6 +22,10 @@
       <button id="fun-fact-hide" onclick="hideFunFact()">Hide fun fact</button>
       <div id="fact-container"></div>
       <h2>Comments</h2>
+      <br>
+      <button id="delete-all-comments" onclick="deleteAllComments()">
+        Delete All Comments
+      </button>
       <form action="/data" method="POST">
         <textarea id="comment-box" name="text-input"
           oninput="checkSubmit('comment-box', 'comment-submit')"  
