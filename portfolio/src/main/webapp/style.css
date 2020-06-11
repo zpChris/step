@@ -101,3 +101,7 @@ li {
 #auth-username-container {
   margin: 10px 0;
 }
+
+#comment-box, #username-box {
+  width: 250px;
+}

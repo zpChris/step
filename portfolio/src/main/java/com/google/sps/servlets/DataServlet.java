@@ -40,6 +40,7 @@ public class DataServlet extends HttpServlet {
   final String COMMENT_TEXT = "text";
   final String COMMENT_DATE = "date";
   public final String COMMENT_EMAIL = "userEmail";
+  public final String COMMENT_USERNAME = "username";
   final String COMMENT_NAME = "Comment";
 
   // Default for max number of comments to show.
@@ -101,7 +102,8 @@ public class DataServlet extends HttpServlet {
       String text = (String) entity.getProperty(COMMENT_TEXT);
       Date date = (Date) entity.getProperty(COMMENT_DATE);
       String email = (String) entity.getProperty(COMMENT_EMAIL);
-      User user = new User(email);
+      String username = (String) entity.getProperty(COMMENT_USERNAME);
+      User user = new User(email, username);
       long id = entity.getKey().getId();
       Comment comment = new Comment(id, text, date, user);
       comments.add(comment);
@@ -142,13 +144,32 @@ public class DataServlet extends HttpServlet {
     return "";
   }
 
+    /**
+   * Returns the id of the user, if the user is logged in.
+   * If no user is logged in, return an empty string (however, a user 
+   * only has post access when logged in).
+   * 
+   * TODO: A user must be signed in to post a comment. However, what if there 
+   * is a bug? How should this be handled? (Duplicate from getUserEmail().)
+   */
+  public String getUserId() {
+    if (userService.isUserLoggedIn()) {
+      return userService.getCurrentUser().getUserId();
+    }
+    return "";
+  }
+
   /**
    * Handle logic of posting comment and redirecting user to original page.
    */
   public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
-    User user = new User(getUserEmail());
+    String userEmail = getUserEmail();
+    String userId = getUserId();
+    String username = AuthServlet.getUsername(userEmail, userId);
+    User user = new User(userEmail, username);
+
 
     // Create a comment entity from the Comment object.
     Comment commentObject = new Comment(text, date, user);
@@ -218,6 +239,7 @@ public class DataServlet extends HttpServlet {
       commentEntity.setProperty(COMMENT_TEXT, this.text);
       commentEntity.setProperty(COMMENT_DATE, this.date);
       commentEntity.setProperty(COMMENT_EMAIL, this.user.emailAddress);
+      commentEntity.setProperty(COMMENT_USERNAME, this.user.username);
       return commentEntity;
     }
   }
@@ -228,9 +250,11 @@ public class DataServlet extends HttpServlet {
   class User {
     // The fields that hold relevant user data.
     private String emailAddress;
+    private String username;
 
-    public User(String emailAddress) {
+    public User(String emailAddress, String username) {
       this.emailAddress = emailAddress;
+      this.username = username;
     }
   }
 

@@ -81,7 +81,7 @@ public class AuthServlet extends HttpServlet {
   /**
    * Add the username to the database, or replace the current username.
    */
-  private void putUsername(String username, String id) {
+  public static void putUsername(String username, String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity entity = new Entity("UserInfo", id);
     entity.setProperty("id", id);
@@ -107,7 +107,7 @@ public class AuthServlet extends HttpServlet {
    * Returns the username of the user with id, or null if the user has not
    * set a username.
    */
-  private String getUsername(String email, String id) {
+  public static String getUsername(String email, String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Query query =
         new Query("UserInfo")
@@ -129,7 +129,7 @@ public class AuthServlet extends HttpServlet {
    * Create a username based on an email, by taking the portion before '@'.
    * If email does not contain an "@", return the email.
    */
-  private String createUsername(String email) {
+  public static String createUsername(String email) {
     if (email.indexOf('@') == -1) {
       return email;
     }

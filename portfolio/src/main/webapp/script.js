@@ -150,9 +150,9 @@ function createComment(comment) {
   dateElement.innerText = comment.date + " UTC";
   dateElement.className = 'span-comment span-comment-date';
 
-  // Create span element holding the user email who posted the comment.
+  // Create span element holding the username and email who posted the comment.
   const userEmailElement = document.createElement('a');
-  userEmailElement.innerText = comment.user.emailAddress;
+  userEmailElement.innerText = comment.user.username;
   userEmailElement.href = 'mailto:' + comment.user.emailAddress;
   userEmailElement.target = '_blank';
   userEmailElement.className = 'span-comment span-comment-email';
@@ -238,7 +238,7 @@ function addAuth() {
     if (authObj.loggedIn) {
       // Create paragraph element holding the username.
       const displayUsername = document.createElement('p');
-      displayUsername.innerText = authObj.username;
+      displayUsername.innerText = 'Username: ' + authObj.username;
 
       // Create paragraph element holding the email.
       const displayEmail = document.createElement('p');
