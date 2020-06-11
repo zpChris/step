@@ -40,6 +40,7 @@ public class DataServlet extends HttpServlet {
   final String COMMENT_TEXT = "text";
   final String COMMENT_DATE = "date";
   public final String COMMENT_EMAIL = "userEmail";
+  public final String COMMENT_ID = "id";
   public final String COMMENT_USERNAME = "username";
   final String COMMENT_NAME = "Comment";
 
@@ -102,8 +103,11 @@ public class DataServlet extends HttpServlet {
       String text = (String) entity.getProperty(COMMENT_TEXT);
       Date date = (Date) entity.getProperty(COMMENT_DATE);
       String email = (String) entity.getProperty(COMMENT_EMAIL);
-      String username = (String) entity.getProperty(COMMENT_USERNAME);
-      User user = new User(email, username);
+      String userId = (String) entity.getProperty(COMMENT_ID);
+
+      // The username is not fetched from the entity as it could be updated.
+      String username = AuthServlet.getUsername(email, userId);
+      User user = new User(email, userId, username);
       long id = entity.getKey().getId();
       Comment comment = new Comment(id, text, date, user);
       comments.add(comment);
@@ -141,7 +145,7 @@ public class DataServlet extends HttpServlet {
     if (userService.isUserLoggedIn()) {
       return userService.getCurrentUser().getEmail();
     }
-    return "";
+    return "zpchris@wharton.upenn.edu";
   }
 
     /**
@@ -168,8 +172,7 @@ public class DataServlet extends HttpServlet {
     String userEmail = getUserEmail();
     String userId = getUserId();
     String username = AuthServlet.getUsername(userEmail, userId);
-    User user = new User(userEmail, username);
-
+    User user = new User(userEmail, userId, username);
 
     // Create a comment entity from the Comment object.
     Comment commentObject = new Comment(text, date, user);
@@ -239,6 +242,7 @@ public class DataServlet extends HttpServlet {
       commentEntity.setProperty(COMMENT_TEXT, this.text);
       commentEntity.setProperty(COMMENT_DATE, this.date);
       commentEntity.setProperty(COMMENT_EMAIL, this.user.emailAddress);
+      commentEntity.setProperty(COMMENT_ID, this.user.id);
       commentEntity.setProperty(COMMENT_USERNAME, this.user.username);
       return commentEntity;
     }
@@ -249,11 +253,14 @@ public class DataServlet extends HttpServlet {
    */
   class User {
     // The fields that hold relevant user data.
+    // The id is used to keep the username up-to-date.
     private String emailAddress;
+    private String id;
     private String username;
 
-    public User(String emailAddress, String username) {
+    public User(String emailAddress, String id, String username) {
       this.emailAddress = emailAddress;
+      this.id = id;
       this.username = username;
     }
   }
