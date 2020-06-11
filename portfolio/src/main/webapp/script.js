@@ -92,6 +92,9 @@ $(document).ready(() => {
   disableSubmit('comment-submit');
   disableSubmit('comment-max-submit');
 
+  // Enable upload file form.
+  fetchBlobstoreUrlAndShowForm();
+
   // Event every time user scrolls.
   $(window).scroll(() => {
     fadeDiv('.project');
@@ -196,4 +199,17 @@ function deleteAllComments() {
   });
   // Delete all the comments in datastore.
   fetch('/delete-data', {method: 'POST'});
+}
+
+
+/**
+ * Fetch the blobstore URL and add it to the form on the frontend.
+ */
+function fetchBlobstoreUrlAndShowForm() {
+  fetch('/blobstore-upload-url').then(response => response.text())
+    .then((imageUploadUrl) => {
+      const messageForm = document.getElementById('upload-form');
+      messageForm.action = imageUploadUrl;
+      messageForm.classList.remove('hidden');
+    });
 }

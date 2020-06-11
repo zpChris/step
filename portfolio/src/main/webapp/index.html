@@ -32,6 +32,12 @@
         <br>
         <input id="comment-submit" type="submit" />
       </form>
+      <form id="upload-form" class="hidden" method="POST" enctype="multipart/form-data">
+        <p>Upload an image:</p>
+        <input type="file" name="image">
+        <br/><br/>
+        <button>Submit</button>
+      </form>
       <form action="/data" method="POST">
         <label for="comment-max">Max Comments Shown (between 1 and 50):</label>
         <input type="number" id="comment-max" name="comment-max" placeholder="1-50"
