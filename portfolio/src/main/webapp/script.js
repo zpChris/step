@@ -100,7 +100,8 @@ $(document).ready(() => {
   // Add frontend styling.
   fadeDiv('.project');
 
-  // Disable post comment and max comments shown submit buttons, by default.
+  // Disable post username, comment, and max comments shown submit buttons.
+  disableSubmit('username-submit');
   disableSubmit('comment-submit');
   disableSubmit('comment-max-submit');
 
