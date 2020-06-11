@@ -235,6 +235,10 @@ function addAuth() {
 
     // Dynamically construct auth information based on user login status.
     if (authObj.loggedIn) {
+      // Create paragraph element holding the username.
+      const displayUsername = document.createElement('p');
+      displayUsername.innerText = authObj.username;
+
       // Create paragraph element holding the email.
       const displayEmail = document.createElement('p');
       displayEmail.innerText = 'Email: ' + authObj.email;
@@ -245,9 +249,15 @@ function addAuth() {
       logoutLink.href = authObj.logoutUrl;
 
       // Add the components to the auth-container div.
+      authContainerDiv.append(displayUsername);
       authContainerDiv.append(displayEmail);
       authContainerDiv.append(logoutLink);
     } else {
+      // Hide the "change username" container.
+      const changeUsernameContainer = 
+        document.getElementById('auth-username-container');
+      changeUsernameContainer.style.display = 'none';
+
       // Create link element that allows users to log in.
       const loginLink = document.createElement('a');
       loginLink.innerText = 'Login';

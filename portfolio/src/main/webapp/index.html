@@ -22,6 +22,16 @@
       <div id="fact-container"></div>
       <h2>Comments</h2>
       <div id="auth-container"></div>
+      <div id="auth-username-container">
+        <div id="auth-username-current"></div>
+        <form action="/auth" method="POST">
+          <textarea id="username-box" name="text-input"
+            oninput="checkSubmit('username-box', 'username-submit')"  
+            minlength="1" placeholder="Enter a username..."></textarea>
+          <br>
+          <input id="username-submit" type="submit" />
+        </form>
+      </div>
       <div id="comment-section-container">
         <form action="/data" method="POST">
           <textarea id="comment-box" name="text-input"

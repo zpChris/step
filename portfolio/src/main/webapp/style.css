@@ -97,3 +97,7 @@ li {
   font-style: italic;
   color: rgb(160, 160, 160);
 }
+
+#auth-username-container {
+  margin: 10px 0;
+}
