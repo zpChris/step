@@ -53,6 +53,9 @@ public class DataServlet extends HttpServlet {
   public static final String COMMENT_MAX = "comment-max";
   public static final String COMMENT_IMAGE = "imageUrl";
 
+  // String identifier to indicate that a non-image was uploaded.
+  public static final String NOT_AN_IMAGE_EXCEPTION = 'invalid_image_input';
+
   // Default for max number of comments to show.
   final int COMMENT_MAX_DEFAULT = 5;
 
@@ -142,8 +145,13 @@ public class DataServlet extends HttpServlet {
 
     // Get the URL of the image that the user uploaded to Blobstore.
     // If no image was uploaded, this will simply be undefined and will be 
-    // handled on the frontend.
+    // handled on the frontend. If a non-image was uploaded, redirect 
+    // back to HTML page.
     String imageUrl = getUploadedFileUrl(request, "image");
+    if (imageUrl.equals(NOT_AN_IMAGE_EXCEPTION)) {
+      response.sendRedirect("/");
+      return;
+    }
 
     // Create a comment entity from the Comment object.
     Comment commentObject = new Comment(text, date, imageUrl);
@@ -219,6 +227,10 @@ public class DataServlet extends HttpServlet {
       return url.getPath();
     } catch (MalformedURLException e) {
       return imagesService.getServingUrl(options);
+    } catch (IllegalArgumentException e) {
+      // This occurs when " If options does not contain a valid blobKey or 
+      // googleStorageFileName"; one example is when a non-image is uploaded.
+      return NOT_AN_IMAGE_EXCEPTION;
     }
   }
 
