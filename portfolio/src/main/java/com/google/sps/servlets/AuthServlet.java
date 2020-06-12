@@ -30,18 +30,18 @@ public class AuthServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
 
-    UserService userService = UserServiceFactory.getUserService();
-    UserAuth userAuth;
+    final UserService userService = UserServiceFactory.getUserService();
+    final UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+      final String userEmail = userService.getCurrentUser().getEmail();
+      final String urlToRedirectToAfterUserLogsOut = "/";
+      final String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail);
     } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+      final String urlToRedirectToAfterUserLogsIn = "/";
+      final String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
       // Create UserAuth object to represent logged-out user.
       userAuth = new UserAuth(loginUrl);
