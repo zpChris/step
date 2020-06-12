@@ -37,15 +37,16 @@ import java.util.Date;
 public class DataServlet extends HttpServlet {
 
   // String identifiers for comment attributes.
-  final String COMMENT_TEXT = "text";
-  final String COMMENT_DATE = "date";
-  public final String COMMENT_EMAIL = "userEmail";
-  public final String COMMENT_ID = "id";
-  public final String COMMENT_USERNAME = "username";
-  final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_TEXT = "text";
+  public static final String COMMENT_DATE = "date";
+  public static final String COMMENT_EMAIL = "userEmail";
+  public static final String COMMENT_ID = "id";
+  public static final String COMMENT_USERNAME = "username";
+  public static final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_MAX = "comment-max";
 
   // Default for max number of comments to show.
-  final int COMMENT_MAX_DEFAULT = 5;
+  public final int COMMENT_MAX_DEFAULT = 5;
 
   // Maximum number of comments that are shown in UI.
   private int commentMax;
@@ -93,8 +94,8 @@ public class DataServlet extends HttpServlet {
    * Get all Comment entities from the provided PreparedQuery. 
    * No more comments than the provided limit allows will be returned.
    */
-  public List<Comment> getComments(PreparedQuery results, int commentMax) {
-    List<Comment> comments = new ArrayList<Comment>();
+  private List<Comment> getComments(PreparedQuery results, int commentMax) {
+    List<Comment> comments = new ArrayList<>();
 
     // Populate comment list until limit is reached or no comments remain.
     int count = 0;
@@ -128,48 +129,50 @@ public class DataServlet extends HttpServlet {
     // Separate POST logic for comments and max comments shown.
     if (request.getParameter("text-input") != null) {
       postComment(request, response);
-    } else if (request.getParameter("comment-max") != null) {
+    } else if (request.getParameter(COMMENT_MAX) != null) {
       setCommentMax(request, response);
     }
   }
 
   /**
    * Returns the email address of the user, if the user is logged in.
-   * If no user is logged in, return an empty string (however, a user 
+   * If no user is logged in, return null (however, a user 
    * only has post access when logged in).
-   * 
-   * TODO: A user must be signed in to post a comment. However, what if there 
-   * is a bug? How should this be handled?
    */
   public String getUserEmail() {
     if (userService.isUserLoggedIn()) {
       return userService.getCurrentUser().getEmail();
     }
-    return "zpchris@wharton.upenn.edu";
+    return null;
   }
 
     /**
    * Returns the id of the user, if the user is logged in.
-   * If no user is logged in, return an empty string (however, a user 
+   * If no user is logged in, return null (however, a user 
    * only has post access when logged in).
-   * 
-   * TODO: A user must be signed in to post a comment. However, what if there 
-   * is a bug? How should this be handled? (Duplicate from getUserEmail().)
    */
   public String getUserId() {
     if (userService.isUserLoggedIn()) {
       return userService.getCurrentUser().getUserId();
     }
-    return "";
+    return null;
   }
 
   /**
    * Handle logic of posting comment and redirecting user to original page.
    */
-  public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
     String userEmail = getUserEmail();
+
+    // Catch an unexpected error where the user posted a comment without logging in.
+    if (userEmail == null) {
+      response.sendRedirect("/");
+      return;
+    }
+
+    // Build user attributes.
     String userId = getUserId();
     String username = AuthServlet.getUsername(userEmail, userId);
     User user = new User(userEmail, userId, username);
@@ -189,9 +192,10 @@ public class DataServlet extends HttpServlet {
   /**
    * Set the max number of comments that can be shown (value between 1 and 50).
    */
-  public void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     this.commentMax = 
-      Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
+      Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
 
     // Redirect back to the HTML page.
     response.sendRedirect("/");
@@ -224,19 +228,19 @@ public class DataServlet extends HttpServlet {
     private User user;
 
     // This constructor can create a Comment Entity (no ID required).
-    public Comment(String text, Date date, User user) {
+    private Comment(String text, Date date, User user) {
       this(0, text, date, user);
     }
 
     // This constructor can accept a Comment Entity object (includes ID).
-    public Comment(long id, String text, Date date, User user) {
+    private Comment(long id, String text, Date date, User user) {
       this.id = id;
       this.text = text;
       this.date = date;
       this.user = user;
     }
 
-    public Entity createCommentEntity() {
+    private Entity createCommentEntity() {
       // Create a comment entity.
       Entity commentEntity = new Entity(COMMENT_NAME);
       commentEntity.setProperty(COMMENT_TEXT, this.text);

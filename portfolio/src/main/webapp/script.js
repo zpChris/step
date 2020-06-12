@@ -139,6 +139,7 @@ function addComments() {
  */
 function createComment(comment) {
   const commentElement = document.createElement('li');
+  commentElement.className = 'comment-element';
 
   // Create span element holding text.
   const textElement = document.createElement('span');
@@ -269,4 +270,17 @@ function addAuth() {
     }
 
   });
+}
+
+/*
+ * Deletes all comments presently in datastore.
+ */
+function deleteAllComments() {
+  // Hide all comments from the frontend.
+  const commentElements = document.getElementsByClassName("comment-element");
+  Array.prototype.forEach.call(commentElements, (commentElement) => {
+    commentElement.style.display = 'none';
+  });
+  // Delete all the comments in datastore.
+  fetch('/delete-data', {method: 'POST'});
 }

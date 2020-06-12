@@ -36,21 +36,21 @@ public class AuthServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
 
-    UserService userService = UserServiceFactory.getUserService();
-    UserAuth userAuth;
+    final UserService userService = UserServiceFactory.getUserService();
+    final UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = 
+      final String userEmail = userService.getCurrentUser().getEmail();
+      final String urlToRedirectToAfterUserLogsOut = "/";
+      final String logoutUrl = 
         userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-      String id = userService.getCurrentUser().getUserId();
-      String username = getUsername(userEmail, id);
+      final String id = userService.getCurrentUser().getUserId();
+      final String username = getUsername(userEmail, id);
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail, username);
     } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+      final String urlToRedirectToAfterUserLogsIn = "/";
+      final String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
       // Create UserAuth object to represent logged-out user.
       userAuth = new UserAuth(loginUrl);
@@ -64,7 +64,7 @@ public class AuthServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     UserService userService = UserServiceFactory.getUserService();
 
-    // TODO: What should I do if the user is not logged in, but still resets a username?
+    // If the user is not logged in, but still resets their username, redirect to index.
     if (!userService.isUserLoggedIn()) {
       response.sendRedirect("/");
       return;
@@ -158,17 +158,17 @@ public class AuthServlet extends HttpServlet {
 
     // Constructor to create UserAuth object with no user logged in.
     // Empty strings represent no value (null is avoided to prevent errors).
-    public UserAuth(String loginUrl) {
+    private UserAuth(String loginUrl) {
       this(false, loginUrl, "", "", "");
     }
 
     // Constructor to create UserAuth object with user logged in.
-    public UserAuth(String logoutUrl, String email, String username) {
+    private UserAuth(String logoutUrl, String email, String username) {
       this(true, "", logoutUrl, email, username);
     }
 
     // Full constructor to assign values to all fields.
-    public UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
+    private UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
       String email, String username) {
         this.loggedIn = loggedIn;
         this.loginUrl = loginUrl;

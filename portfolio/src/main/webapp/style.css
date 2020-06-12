@@ -105,3 +105,7 @@ li {
 #comment-box, #username-box {
   width: 250px;
 }
+
+form {
+  margin: 10px 0;
+}
