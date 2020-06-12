@@ -87,8 +87,15 @@ function fadeDiv(classOrIdName) {
 // Triggered upon DOM load.
 $(document).ready(() => {
   // Add servlet information to frontend.
-  addComments();
   addAuth();
+  isLoggedIn().then(loggedIn => {
+    // Add comments to frontend only if user is logged in.
+    if (loggedIn) {
+      addComments();
+    } else {
+      hideComments();
+    }
+  });
 
   // Add frontend styling.
   fadeDiv('.project');
@@ -178,6 +185,14 @@ function disableSubmit(elementId) {
 }
 
 /**
+ * Hide the comment section from the user.
+ */
+function hideComments() {
+  const commentContainer = document.getElementById('comment-section-container');
+  commentContainer.style.display = 'none';
+}
+
+/**
  * Check if the correlated input element box has text; if so, enable the 
  * "submit" button corresponding to that input element.
  */
@@ -188,6 +203,19 @@ function checkSubmit(inputElementId, submitElementId) {
   } else {
     document.getElementById(submitElementId).disabled = false;
   }
+}
+
+/**
+ * Return Promise (w/ boolean) that indicates whether the user is logged in.
+ */
+function isLoggedIn() {
+  return new Promise((resolve, reject) => {
+    fetch('/auth').then(response => response.json()).then((authObj) => {
+      resolve(authObj.loggedIn);
+    }).catch((error) => {
+      reject(error);
+    })
+  });
 }
 
 /**
