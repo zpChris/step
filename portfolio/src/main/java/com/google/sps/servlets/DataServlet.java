@@ -37,13 +37,13 @@ import java.util.Date;
 public class DataServlet extends HttpServlet {
 
   // String identifiers for comment attributes.
-  final String COMMENT_TEXT = "text";
-  final String COMMENT_DATE = "date";
+  public final String COMMENT_TEXT = "text";
+  public final String COMMENT_DATE = "date";
   public final String COMMENT_EMAIL = "userEmail";
-  final String COMMENT_NAME = "Comment";
+  public final String COMMENT_NAME = "Comment";
 
   // Default for max number of comments to show.
-  final int COMMENT_MAX_DEFAULT = 5;
+  public final int COMMENT_MAX_DEFAULT = 5;
 
   // Maximum number of comments that are shown in UI.
   private int commentMax;
