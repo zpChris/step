@@ -51,9 +51,9 @@ public class DataServlet extends HttpServlet {
     this.commentMax = COMMENT_MAX_DEFAULT;
   }
 
-   /**
-   * Converts a List of Comments into a JSON string using the Gson library.
-   */
+  /**
+  * Converts a List of Comments into a JSON string using the Gson library.
+  */
   private String convertToJson(List<Comment> messages) {
     Gson gson = new Gson();
     String json = gson.toJson(messages);
@@ -85,7 +85,7 @@ public class DataServlet extends HttpServlet {
    * Get all Comment entities from the provided PreparedQuery. 
    * No more comments than the provided limit allows will be returned.
    */
-  public List<Comment> getComments(PreparedQuery results, int commentMax) {
+  private List<Comment> getComments(PreparedQuery results, int commentMax) {
     List<Comment> comments = new ArrayList<>();
 
     // Populate comment list until limit is reached or no comments remain.
@@ -122,7 +122,7 @@ public class DataServlet extends HttpServlet {
   /**
    * Handle logic of posting comment and redirecting user to original page.
    */
-  public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
 
@@ -141,7 +141,7 @@ public class DataServlet extends HttpServlet {
   /**
    * Set the max number of comments that can be shown (value between 1 and 50).
    */
-  public void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     this.commentMax = 
       Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
@@ -176,18 +176,18 @@ public class DataServlet extends HttpServlet {
     private Date date;
 
     // This constructor can create a Comment Entity (no ID required).
-    public Comment(String text, Date date) {
+    private Comment(String text, Date date) {
       this(0, text, date);
     }
 
     // This constructor can accept a Comment Entity object (includes ID).
-    public Comment(long id, String text, Date date) {
+    private Comment(long id, String text, Date date) {
       this.id = id;
       this.text = text;
       this.date = date;
     }
 
-    public Entity createCommentEntity() {
+    private Entity createCommentEntity() {
       // Create a comment entity.
       Entity commentEntity = new Entity(COMMENT_NAME);
       commentEntity.setProperty(COMMENT_TEXT, this.text);
