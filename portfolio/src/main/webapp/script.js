@@ -141,6 +141,13 @@ function createComment(comment) {
   dateElement.innerText = comment.date + " UTC";
   dateElement.className = 'span-comment span-comment-date';
 
+  // Create img element holding the uploaded image, if one was uploaded.
+  if (comment.imageUrl != null) {
+    const imageElement = document.createElement('img');
+    imageElement.src = comment.imageUrl;
+    commentElement.appendChild(imageElement);
+  }
+
   // Create a delete button that triggers another function.
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
