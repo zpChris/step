@@ -54,7 +54,7 @@ public class DataServlet extends HttpServlet {
   public static final String COMMENT_IMAGE = "imageUrl";
 
   // String identifier to indicate that a non-image was uploaded.
-  public static final String NOT_AN_IMAGE_EXCEPTION = 'invalid_image_input';
+  public static final String NOT_AN_IMAGE_EXCEPTION = "invalid_image_input";
 
   // Default for max number of comments to show.
   final int COMMENT_MAX_DEFAULT = 5;
