@@ -35,9 +35,10 @@ import java.util.Date;
 public class DataServlet extends HttpServlet {
 
   // String identifiers for comment attributes.
-  final String COMMENT_TEXT = "text";
-  final String COMMENT_DATE = "date";
-  final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_TEXT = "text";
+  public static final String COMMENT_DATE = "date";
+  public static final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_MAX = "comment-max";
 
   // Default for max number of comments to show.
   final int COMMENT_MAX_DEFAULT = 5;
@@ -84,8 +85,8 @@ public class DataServlet extends HttpServlet {
    * Get all Comment entities from the provided PreparedQuery. 
    * No more comments than the provided limit allows will be returned.
    */
-  public List<Comment> getComments(PreparedQuery results, int commentMax) {
-    List<Comment> comments = new ArrayList<Comment>();
+  private List<Comment> getComments(PreparedQuery results, int commentMax) {
+    List<Comment> comments = new ArrayList<>();
 
     // Populate comment list until limit is reached or no comments remain.
     int count = 0;
@@ -113,7 +114,7 @@ public class DataServlet extends HttpServlet {
     // Separate POST logic for comments and max comments shown.
     if (request.getParameter("text-input") != null) {
       postComment(request, response);
-    } else if (request.getParameter("comment-max") != null) {
+    } else if (request.getParameter(COMMENT_MAX) != null) {
       setCommentMax(request, response);
     }
   }
@@ -121,7 +122,7 @@ public class DataServlet extends HttpServlet {
   /**
    * Handle logic of posting comment and redirecting user to original page.
    */
-  public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
 
@@ -140,9 +141,10 @@ public class DataServlet extends HttpServlet {
   /**
    * Set the max number of comments that can be shown (value between 1 and 50).
    */
-  public void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private void setCommentMax(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     this.commentMax = 
-      Integer.parseInt(getParameter(request, "comment-max", "" + this.commentMax));
+      Integer.parseInt(getParameter(request, COMMENT_MAX, "" + this.commentMax));
 
     // Redirect back to the HTML page.
     response.sendRedirect("/");
@@ -174,18 +176,18 @@ public class DataServlet extends HttpServlet {
     private Date date;
 
     // This constructor can create a Comment Entity (no ID required).
-    public Comment(String text, Date date) {
+    private Comment(String text, Date date) {
       this(0, text, date);
     }
 
     // This constructor can accept a Comment Entity object (includes ID).
-    public Comment(long id, String text, Date date) {
+    private Comment(long id, String text, Date date) {
       this.id = id;
       this.text = text;
       this.date = date;
     }
 
-    public Entity createCommentEntity() {
+    private Entity createCommentEntity() {
       // Create a comment entity.
       Entity commentEntity = new Entity(COMMENT_NAME);
       commentEntity.setProperty(COMMENT_TEXT, this.text);

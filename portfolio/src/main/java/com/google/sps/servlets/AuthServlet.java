@@ -30,18 +30,18 @@ public class AuthServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
 
-    UserService userService = UserServiceFactory.getUserService();
-    UserAuth userAuth;
+    final UserService userService = UserServiceFactory.getUserService();
+    final UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
-      String userEmail = userService.getCurrentUser().getEmail();
-      String urlToRedirectToAfterUserLogsOut = "/";
-      String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
+      final String userEmail = userService.getCurrentUser().getEmail();
+      final String urlToRedirectToAfterUserLogsOut = "/";
+      final String logoutUrl = userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail);
     } else {
-      String urlToRedirectToAfterUserLogsIn = "/";
-      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+      final String urlToRedirectToAfterUserLogsIn = "/";
+      final String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
       // Create UserAuth object to represent logged-out user.
       userAuth = new UserAuth(loginUrl);
@@ -72,17 +72,17 @@ public class AuthServlet extends HttpServlet {
 
     // Constructor to create UserAuth object with no user logged in.
     // Empty strings represent no value (null is avoided).
-    public UserAuth(String loginUrl) {
+    private UserAuth(String loginUrl) {
       this(false, loginUrl, "", "");
     }
 
     // Constructor to create UserAuth object with user logged in.
-    public UserAuth(String logoutUrl, String email) {
+    private UserAuth(String logoutUrl, String email) {
       this(true, "", logoutUrl, email);
     }
 
     // Full constructor to assign values to all fields.
-    public UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
+    private UserAuth(boolean loggedIn, String loginUrl, String logoutUrl, 
       String email) {
         this.loggedIn = loggedIn;
         this.loginUrl = loginUrl;
