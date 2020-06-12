@@ -85,6 +85,10 @@ li {
   margin: 5px 0;
 }
 
+#auth-container {
+  margin: 10px 0;
+}
+
 .span-comment {
   margin: 5px;
 }

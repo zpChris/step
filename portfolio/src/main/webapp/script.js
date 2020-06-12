@@ -86,6 +86,18 @@ function fadeDiv(classOrIdName) {
 
 // Triggered upon DOM load.
 $(document).ready(() => {
+  // Add servlet information to frontend.
+  addAuth();
+  isLoggedIn().then(loggedIn => {
+    // Add comments to frontend only if user is logged in.
+    if (loggedIn) {
+      addComments();
+    } else {
+      hideComments();
+    }
+  });
+
+  // Add frontend styling.
   fadeDiv('.project');
 
   // Disable post comment and max comments shown submit buttons, by default.
@@ -183,6 +195,14 @@ function disableSubmit(elementId) {
 }
 
 /**
+ * Hide the comment section from the user.
+ */
+function hideComments() {
+  const commentContainer = document.getElementById('comment-section-container');
+  commentContainer.style.display = 'none';
+}
+
+/**
  * Check if the correlated input element box has text; if so, enable the 
  * "submit" button corresponding to that input element.
  */
@@ -196,6 +216,54 @@ function checkSubmit(inputElementId, submitElementId) {
 }
 
 /**
+ * Return Promise (w/ boolean) that indicates whether the user is logged in.
+ */
+function isLoggedIn() {
+  return new Promise((resolve, reject) => {
+    fetch('/auth').then(response => response.json()).then((authObj) => {
+      resolve(authObj.loggedIn);
+    }).catch((error) => {
+      reject(error);
+    })
+  });
+}
+
+/**
+ * Add the user login/logout status to page, along with email (if applicable).
+ * Provides options to login and logout.
+ */
+function addAuth() {
+  fetch('/auth').then(response => response.json()).then((authObj) => {
+    let authContainerDiv = document.getElementById('auth-container');
+
+    // Dynamically construct auth information based on user login status.
+    if (authObj.loggedIn) {
+      // Create paragraph element holding the email.
+      const displayEmail = document.createElement('p');
+      displayEmail.innerText = 'Email: ' + authObj.email;
+
+      // Create link element that allows users to log out.
+      const logoutLink = document.createElement('a');
+      logoutLink.innerText = 'Logout';
+      logoutLink.href = authObj.logoutUrl;
+
+      // Add the components to the auth-container div.
+      authContainerDiv.append(displayEmail);
+      authContainerDiv.append(logoutLink);
+    } else {
+      // Create link element that allows users to log in.
+      const loginLink = document.createElement('a');
+      loginLink.innerText = 'Login';
+      loginLink.href = authObj.loginUrl;
+      
+      // Add the login link to the auth-container div.
+      authContainerDiv.append(loginLink);
+    }
+
+  });
+}
+
+/*
  * Deletes all comments presently in datastore.
  */
 function deleteAllComments() {
@@ -207,7 +275,6 @@ function deleteAllComments() {
   // Delete all the comments in datastore.
   fetch('/delete-data', {method: 'POST'});
 }
-
 
 /**
  * Fetch the blobstore URL and add it to the form on the frontend.
