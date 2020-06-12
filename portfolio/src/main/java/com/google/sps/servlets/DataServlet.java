@@ -129,17 +129,14 @@ public class DataServlet extends HttpServlet {
 
   /**
    * Returns the email address of the user, if the user is logged in.
-   * If no user is logged in, return an empty string (however, a user 
+   * If no user is logged in, return null (however, a user 
    * only has post access when logged in).
-   * 
-   * TODO: A user must be signed in to post a comment. However, what if there 
-   * is a bug? How should this be handled?
    */
   public String getUserEmail() {
     if (userService.isUserLoggedIn()) {
       return userService.getCurrentUser().getEmail();
     }
-    return "";
+    return null;
   }
 
   /**
@@ -148,7 +145,15 @@ public class DataServlet extends HttpServlet {
   public void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
-    User user = new User(getUserEmail());
+    String email = getUserEmail();
+    
+    // Catch an unexpected error where the user posted a comment without logging in.
+    if (email == null) {
+      response.sendRedirect("/");
+      return;
+    }
+
+    User user = new User(email);
 
     // Create a comment entity from the Comment object.
     Comment commentObject = new Comment(text, date, user);
