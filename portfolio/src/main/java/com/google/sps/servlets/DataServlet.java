@@ -148,7 +148,7 @@ public class DataServlet extends HttpServlet {
     // handled on the frontend. If a non-image was uploaded, redirect 
     // back to HTML page.
     String imageUrl = getUploadedFileUrl(request, "image");
-    if (imageUrl != null && imageUrl.equals(NOT_AN_IMAGE_EXCEPTION)) {
+    if (imageUrl != null || imageUrl.equals(NOT_AN_IMAGE_EXCEPTION)) {
       response.sendRedirect("/");
       return;
     }
@@ -208,7 +208,7 @@ public class DataServlet extends HttpServlet {
 
     // User submitted form without selecting a file, so we can't get a URL. (live server)
     BlobInfo blobInfo = new BlobInfoFactory().loadBlobInfo(blobKey);
-    if (blobInfo.getSize() == 0) {
+    if (blobInfo.getSize() <= 0) {
       blobstoreService.delete(blobKey);
       return null;
     }
