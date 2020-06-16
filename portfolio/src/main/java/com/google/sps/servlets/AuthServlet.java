@@ -130,7 +130,7 @@ public class AuthServlet extends HttpServlet {
    * If email does not contain an "@", return the email.
    */
   public static String createUsername(String email) {
-    if (!email.contains('@')) {
+    if (!email.contains("@")) {
       return email;
     }
     return email.substring(0, email.indexOf('@'));
