@@ -105,7 +105,7 @@ public class DataServlet extends HttpServlet {
       Date date = (Date) entity.getProperty(COMMENT_DATE);
       String email = (String) entity.getProperty(COMMENT_EMAIL);
       String userId = (String) entity.getProperty(COMMENT_ID);
-
+      
       // The username is not fetched from the entity as it could be updated.
       String username = AuthServlet.getUsername(email, userId);
       User user = new User(email, userId, username);
@@ -146,7 +146,7 @@ public class DataServlet extends HttpServlet {
     return null;
   }
 
-    /**
+  /**
    * Returns the id of the user, if the user is logged in.
    * If no user is logged in, return null (however, a user 
    * only has post access when logged in).

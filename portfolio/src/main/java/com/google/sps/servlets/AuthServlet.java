@@ -104,8 +104,8 @@ public class AuthServlet extends HttpServlet {
   }
 
   /** 
-   * Returns the username of the user with id, or null if the user has not
-   * set a username.
+   * Returns the username of the user with id, or create an new username based
+   * off the input email if the user does not yet have a username.
    */
   public static String getUsername(String email, String id) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -157,14 +157,14 @@ public class AuthServlet extends HttpServlet {
     private String username;
 
     // Constructor to create UserAuth object with no user logged in.
-    // Empty strings represent no value (null is avoided to prevent errors).
+    // Null represents no value.
     private UserAuth(String loginUrl) {
-      this(false, loginUrl, "", "", "");
+      this(false, loginUrl, null, null, null);
     }
 
     // Constructor to create UserAuth object with user logged in.
     private UserAuth(String logoutUrl, String email, String username) {
-      this(true, "", logoutUrl, email, username);
+      this(true, null, logoutUrl, email, username);
     }
 
     // Full constructor to assign values to all fields.
