@@ -36,21 +36,21 @@ public class AuthServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     response.setContentType("application/json");
 
-    final UserService userService = UserServiceFactory.getUserService();
-    final UserAuth userAuth;
+    UserService userService = UserServiceFactory.getUserService();
+    UserAuth userAuth;
     if (userService.isUserLoggedIn()) {
-      final String userEmail = userService.getCurrentUser().getEmail();
+      String userEmail = userService.getCurrentUser().getEmail();
       final String urlToRedirectToAfterUserLogsOut = "/";
-      final String logoutUrl = 
+      String logoutUrl = 
         userService.createLogoutURL(urlToRedirectToAfterUserLogsOut);
-      final String id = userService.getCurrentUser().getUserId();
-      final String username = getUsername(userEmail, id);
+      String id = userService.getCurrentUser().getUserId();
+      String username = getUsername(userEmail, id);
 
       // Create UserAuth object to represent logged-in user.
       userAuth = new UserAuth(logoutUrl, userEmail, username);
     } else {
       final String urlToRedirectToAfterUserLogsIn = "/";
-      final String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
+      String loginUrl = userService.createLoginURL(urlToRedirectToAfterUserLogsIn);
 
       // Create UserAuth object to represent logged-out user.
       userAuth = new UserAuth(loginUrl);
@@ -130,7 +130,7 @@ public class AuthServlet extends HttpServlet {
    * If email does not contain an "@", return the email.
    */
   public static String createUsername(String email) {
-    if (email.indexOf('@') == -1) {
+    if (!email.contains('@')) {
       return email;
     }
     return email.substring(0, email.indexOf('@'));
