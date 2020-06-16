@@ -14,6 +14,8 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
@@ -38,17 +40,22 @@ public class DataServlet extends HttpServlet {
   public static final String COMMENT_TEXT = "text";
   public static final String COMMENT_DATE = "date";
   public static final String COMMENT_NAME = "Comment";
+  public static final String COMMENT_EMAIL = "userEmail";
   public static final String COMMENT_MAX = "comment-max";
 
   // Default for max number of comments to show.
-  final int COMMENT_MAX_DEFAULT = 5;
+  public final int COMMENT_MAX_DEFAULT = 5;
 
   // Maximum number of comments that are shown in UI.
   private int commentMax;
 
+  // UserService object to identify user attributes
+  private UserService userService;
+
   @Override
   public void init() {
     this.commentMax = COMMENT_MAX_DEFAULT;
+    this.userService = UserServiceFactory.getUserService();
   }
 
   /**
@@ -94,8 +101,10 @@ public class DataServlet extends HttpServlet {
       // Build the comment.
       String text = (String) entity.getProperty(COMMENT_TEXT);
       Date date = (Date) entity.getProperty(COMMENT_DATE);
+      String email = (String) entity.getProperty(COMMENT_EMAIL);
+      User user = new User(email);
       long id = entity.getKey().getId();
-      Comment comment = new Comment(id, text, date);
+      Comment comment = new Comment(id, text, date, user);
       comments.add(comment);
 
       // Update count, and stop adding comments if comment max limit is reached.
@@ -120,14 +129,35 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
+   * Returns the email address of the user, if the user is logged in.
+   * If no user is logged in, return null (however, a user 
+   * only has post access when logged in).
+   */
+  public String getUserEmail() {
+    if (userService.isUserLoggedIn()) {
+      return userService.getCurrentUser().getEmail();
+    }
+    return null;
+  }
+
+  /**
    * Handle logic of posting comment and redirecting user to original page.
    */
   private void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
+    String email = getUserEmail();
+    
+    // Catch an unexpected error where the user posted a comment without logging in.
+    if (email == null) {
+      response.sendRedirect("/");
+      return;
+    }
+
+    User user = new User(email);
 
     // Create a comment entity from the Comment object.
-    Comment commentObject = new Comment(text, date);
+    Comment commentObject = new Comment(text, date, user);
     Entity commentEntity = commentObject.createCommentEntity();
 
     // Add the comment entity to the DatastoreService.
@@ -174,17 +204,19 @@ public class DataServlet extends HttpServlet {
     // The fields that hold the relevant comment data.
     private String text;
     private Date date;
+    private User user;
 
     // This constructor can create a Comment Entity (no ID required).
-    private Comment(String text, Date date) {
-      this(0, text, date);
+    private Comment(String text, Date date, User user) {
+      this(0, text, date, user);
     }
 
     // This constructor can accept a Comment Entity object (includes ID).
-    private Comment(long id, String text, Date date) {
+    private Comment(long id, String text, Date date, User user) {
       this.id = id;
       this.text = text;
       this.date = date;
+      this.user = user;
     }
 
     private Entity createCommentEntity() {
@@ -192,7 +224,20 @@ public class DataServlet extends HttpServlet {
       Entity commentEntity = new Entity(COMMENT_NAME);
       commentEntity.setProperty(COMMENT_TEXT, this.text);
       commentEntity.setProperty(COMMENT_DATE, this.date);
+      commentEntity.setProperty(COMMENT_EMAIL, this.user.emailAddress);
       return commentEntity;
+    }
+  }
+
+  /**
+   * Inner class for the User that is currently logged in.
+   */
+  class User {
+    // The fields that hold relevant user data.
+    private String emailAddress;
+
+    public User(String emailAddress) {
+      this.emailAddress = emailAddress;
     }
   }
 
