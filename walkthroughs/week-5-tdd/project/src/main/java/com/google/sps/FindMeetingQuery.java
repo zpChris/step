@@ -31,6 +31,9 @@ public final class FindMeetingQuery {
     // This is the list of the attendees which attend the meeting.
     Collection<String> attendees = request.getAttendees();
 
+    // The duration of the meeting request.
+    int meetingDuration = (int) request.getDuration();
+
     // Populate invalidTimeRanges variable, and sort by increasing start time.
     invalidTimeRanges = getInvalidTimeRanges(invalidTimeRanges, events, attendees);
     Collections.sort(invalidTimeRanges, new Comparator<TimeRange>() {
@@ -48,8 +51,62 @@ public final class FindMeetingQuery {
     // Merge conflicting TimeRanges.
     invalidTimeRanges = mergeConflictingTimeRanges(invalidTimeRanges);
 
-    return invalidTimeRanges;
+    // Get the inverse / valid TimeRanges of the invalidTimeRanges.
+    List<TimeRange> validTimeRanges = getValidTimeRanges(invalidTimeRanges, 
+      meetingDuration);
 
+    return validTimeRanges;
+
+  }
+
+	/**
+   * Returns true if the duration (presumably of a TimeRange) is longer than
+   * the meeting duration request.
+   */
+  private boolean fitsMeetingDuration(int duration, int meetingDuration) {
+    return duration >= meetingDuration; 
+  }
+
+  /**
+   * Get the valid (inverse) TimeRanges from invalidTimeRanges.
+   * A valid TimeRange is not added if it is shorter than the meeting request 
+   * length.
+   * 
+   * Example:
+   * Meeting Request Duration: 30 minutes.
+   * invalidTimeRanges: [(100, 200), (500, 1400), (1700, 1900)]
+   * validTimeRanges:   [(0, 100), (200, 500), (1400, 1700), (1900, 2400)]
+   */
+  private List<TimeRange> getValidTimeRanges(List<TimeRange> invalidTimeRanges, 
+    int meetingDuration) {
+    List<TimeRange> validTimeRanges = new ArrayList<>();
+
+    // Get the inverse TimeRanges of the invalidTimeRanges.
+    int index = 0;
+    int start = TimeRange.START_OF_DAY;
+    int end = TimeRange.START_OF_DAY;
+    while (index < invalidTimeRanges.size()) {
+      end = invalidTimeRanges.get(index).start();
+
+      // Add new valid TimeRange to list.
+      if (start != end && fitsMeetingDuration(end - start, meetingDuration)) {
+        validTimeRanges.add(TimeRange.fromStartEnd(start, end, false));
+      }
+
+      // Get the start of the next valid TimeRange, and increment index.
+      start = invalidTimeRanges.get(index).end();
+      index++;
+    }
+
+    // Get the last valid TimeRange, if applicable (inclusive on END_OF_DAY).
+    if (start != TimeRange.END_OF_DAY + 1 && 
+      fitsMeetingDuration(TimeRange.END_OF_DAY - start, meetingDuration)) {
+
+      validTimeRanges.add(
+        TimeRange.fromStartEnd(start, TimeRange.END_OF_DAY, true));
+    }
+
+    return validTimeRanges;
   }
 
   /**
@@ -60,7 +117,6 @@ public final class FindMeetingQuery {
       
     int index = 0;
     while (index < invalidTimeRanges.size() - 1) {
-      // TODO: Ensure you take care of nested events
       TimeRange firstTimeRange = invalidTimeRanges.get(index);
       TimeRange secondTimeRange = invalidTimeRanges.get(index + 1);
 
