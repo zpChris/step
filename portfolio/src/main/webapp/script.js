@@ -160,6 +160,13 @@ function createComment(comment) {
     commentElement.appendChild(imageElement);
   }
 
+  // Create span element holding the user email who posted the comment.
+  const userEmailElement = document.createElement('a');
+  userEmailElement.innerText = comment.user.emailAddress;
+  userEmailElement.href = 'mailto:' + comment.user.emailAddress;
+  userEmailElement.target = '_blank';
+  userEmailElement.className = 'span-comment span-comment-email';
+
   // Create a delete button that triggers another function.
   const deleteButtonElement = document.createElement('button');
   deleteButtonElement.innerText = 'Delete';
@@ -174,6 +181,7 @@ function createComment(comment) {
   // Add the text, date, and delete button to the comment.
   commentElement.appendChild(textElement);
   commentElement.appendChild(dateElement);
+  commentElement.appendChild(userEmailElement);
   commentElement.appendChild(deleteButtonElement);
   return commentElement;
 }
