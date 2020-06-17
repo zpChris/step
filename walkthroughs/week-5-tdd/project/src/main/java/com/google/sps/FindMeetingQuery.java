@@ -27,12 +27,163 @@ public final class FindMeetingQuery {
     // This variable will hold all of the invalid meeting times.
     // This list is sorted by start times, and has no overlapping times.
     List<TimeRange> invalidTimeRanges = new ArrayList<>();
+
+    // This variable will hold all of the invalid meeting times for optional 
+    // attendees. This list is sorted by start times, and has no overlapping times.
+    List<TimeRange> invalidOptionalTimeRanges = new ArrayList<>();
     
     // This is the list of the attendees which attend the meeting.
     Collection<String> attendees = request.getAttendees();
 
+    // This is the list of optional attendees for the meeting.
+    Collection<String> optionalAttendees = request.getOptionalAttendees();
+
     // The duration of the meeting request.
     int meetingDuration = (int) request.getDuration();
+
+    // If no attendees (regular or optional) exist, return the whole day.
+    if (attendees.isEmpty() && optionalAttendees.isEmpty()) {
+      List<TimeRange> allDayTimeRangeList = new ArrayList<TimeRange>();
+      allDayTimeRangeList.add(TimeRange.WHOLE_DAY);
+      return allDayTimeRangeList;
+    } else if (attendees.isEmpty()) {
+      // If only optional attendees exist, create a schedule for them.
+      invalidOptionalTimeRanges = getAndMergeInvalidTimeRanges(
+        invalidOptionalTimeRanges, events, optionalAttendees);
+      List<TimeRange> validOptionalTimeRanges = getValidTimeRanges(
+        invalidOptionalTimeRanges, meetingDuration);
+      return validOptionalTimeRanges;
+    }
+
+    // Get and merge both the TimeRanges for regular and optional attendees.
+    invalidTimeRanges = getAndMergeInvalidTimeRanges(
+      invalidTimeRanges, events, attendees);
+    invalidOptionalTimeRanges = getAndMergeInvalidTimeRanges(
+      invalidOptionalTimeRanges, events, optionalAttendees);
+
+    // Get the inverse / valid TimeRanges of the invalidTimeRanges.
+    List<TimeRange> validTimeRanges = getValidTimeRanges(invalidTimeRanges, 
+      meetingDuration);
+
+    // Restrict valid TimeRanges with optional TimeRanges.
+    validTimeRanges = restrictTimeRanges(validTimeRanges, 
+      invalidOptionalTimeRanges, meetingDuration);
+
+    return validTimeRanges;
+
+  }
+
+  /**
+   * Restrict the valid TimeRanges to allow optional attendees to attend.
+   * If it is impossible to allow all optional attendees to attend, return 
+   * the same valid TimeRanges.
+   */
+  private List<TimeRange> restrictTimeRanges(List<TimeRange> validTimeRanges, 
+    List<TimeRange> invalidOptionalTimeRanges, int meetingDuration) {
+    
+    // Save the current valid TimeRange list, in case optional attendees cannot attend.
+    List<TimeRange> originalValidTimeRanges = new ArrayList<TimeRange>(validTimeRanges);
+
+    // Create indices for validTimeRanges (vtr) and invalidOptionalTimeRanges (iotr).
+    int vtrIndex = 0;
+    int iotrIndex = 0;
+    while (vtrIndex < validTimeRanges.size() - 1 &&
+      iotrIndex < invalidOptionalTimeRanges.size()) {
+
+      // Get the two TimeRanges in question.
+      TimeRange validTimeRange = validTimeRanges.get(vtrIndex);
+      TimeRange optionalTimeRange = invalidOptionalTimeRanges.get(iotrIndex);
+
+      // Restrict the valid TimeRange to fit optional attendees if a conflict occurs.
+      if (optionalTimeRange.overlaps(validTimeRange)) {
+        List<TimeRange> builtValidTimeRanges = buildValidTimeRanges(validTimeRange, 
+          optionalTimeRange, meetingDuration);
+        
+        // Add newly-built validTimeRanges to list, and delete old valid TimeRange.
+        validTimeRanges.remove(validTimeRange);
+        for (TimeRange builtValidTimeRange : builtValidTimeRanges) {
+          validTimeRanges.add(iotrIndex, builtValidTimeRange);
+          iotrIndex++;
+        }
+        iotrIndex--;
+      }
+
+      // Update the vtrIndex or iotrIndex depending on sorted order.
+      if (validTimeRanges.get(vtrIndex).end() < 
+        invalidOptionalTimeRanges.get(iotrIndex).end()) {
+        
+        vtrIndex++;
+      } else {
+        iotrIndex++;
+      }
+    }
+
+    // If no valid TimeRanges are left, return the original validTimeRanges variable.
+    if (validTimeRanges.isEmpty()) {
+      return originalValidTimeRanges;
+    }
+    
+    return validTimeRanges;
+  }
+
+  /**
+   * Return a built list for the new valid TimeRange(s), given that it 
+   * conflicts with an optional TimeRange.
+   * 
+   * An empty list indicates that the valid TimeRange is completely overlapped
+   * by the optional TimeRange, or that no valid TimeRange can fit the 
+   * specified meeting duration.
+   */
+  private List<TimeRange> buildValidTimeRanges(TimeRange validTimeRange, 
+    TimeRange optionalTimeRange, int meetingDuration) {
+
+    List<TimeRange> builtValidTimeRanges = new ArrayList<>();
+
+    // Separate into different cases, and address specifically.
+    // The first 'if' statement ensures that if the optional TimeRange contains
+    // the entire valid TimeRange, an empty list is returned.
+    if (optionalTimeRange.contains(validTimeRange)) {
+      return builtValidTimeRanges;
+    } else if (validTimeRange.contains(optionalTimeRange)) {
+      TimeRange fromValidStart = TimeRange.fromStartEnd(validTimeRange.start(), 
+        optionalTimeRange.start(), false);
+      TimeRange fromOptionalEnd = TimeRange.fromStartEnd(optionalTimeRange.end(),
+        validTimeRange.end(), false);
+      
+      // Add the TimeRanges if they fit the meeting duration.
+      if (fitsMeetingDuration(fromValidStart.duration(), meetingDuration)) {
+        builtValidTimeRanges.add(fromValidStart);
+      }
+      if (fitsMeetingDuration(fromOptionalEnd.duration(), meetingDuration)) {
+        builtValidTimeRanges.add(fromOptionalEnd);
+      }
+    } else if (validTimeRange.start() < optionalTimeRange.start()) {
+      TimeRange fromValidStart = TimeRange.fromStartEnd(validTimeRange.start(), 
+        optionalTimeRange.start(), false);
+      
+      // Add the TimeRange if it fits the meeting duration.
+      if (fitsMeetingDuration(fromValidStart.duration(), meetingDuration)) {
+        builtValidTimeRanges.add(fromValidStart);
+      }
+    } else if (optionalTimeRange.start() < validTimeRange.start()) {
+      TimeRange fromOptionalEnd = TimeRange.fromStartEnd(optionalTimeRange.end(), 
+        validTimeRange.end(), false);
+      
+      // Add the TimeRange if it fits the meeting duration.
+      if (fitsMeetingDuration(fromOptionalEnd.duration(), meetingDuration)) {
+        builtValidTimeRanges.add(fromOptionalEnd);
+      }
+    }
+
+    return builtValidTimeRanges;
+  }
+
+  /**
+   * Calls both the 'get' and 'merge' functions for preparing the invalid 
+   * TimeRanges. This function works with both regular and optional attendees.
+   */
+  private List<TimeRange> getAndMergeInvalidTimeRanges(List<TimeRange> invalidTimeRanges, 
+    Collection<Event> events, Collection<String> attendees) {
 
     // Populate invalidTimeRanges variable, and sort by increasing start time.
     invalidTimeRanges = getInvalidTimeRanges(invalidTimeRanges, events, attendees);
@@ -50,13 +201,7 @@ public final class FindMeetingQuery {
 
     // Merge conflicting TimeRanges.
     invalidTimeRanges = mergeConflictingTimeRanges(invalidTimeRanges);
-
-    // Get the inverse / valid TimeRanges of the invalidTimeRanges.
-    List<TimeRange> validTimeRanges = getValidTimeRanges(invalidTimeRanges, 
-      meetingDuration);
-
-    return validTimeRanges;
-
+    return invalidTimeRanges;
   }
 
 	/**

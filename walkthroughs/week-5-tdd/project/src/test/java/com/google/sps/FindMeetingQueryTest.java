@@ -43,7 +43,6 @@ public final class FindMeetingQueryTest {
   private static final int TIME_0930AM = TimeRange.getTimeInMinutes(9, 30);
   private static final int TIME_1000AM = TimeRange.getTimeInMinutes(10, 0);
   private static final int TIME_1100AM = TimeRange.getTimeInMinutes(11, 00);
-  private static final int TIME_0400PM = TimeRange.getTimeInMinutes(16, 00);
 
   private static final int DURATION_15_MINUTES = 15;
   private static final int DURATION_30_MINUTES = 30;
@@ -298,7 +297,7 @@ public final class FindMeetingQueryTest {
             Arrays.asList(PERSON_A)),
         new Event("Event 2", TimeRange.fromStartDuration(TIME_0900AM, DURATION_30_MINUTES),
             Arrays.asList(PERSON_B)),
-        new Event("Event 3", TimeRange.fromStartDuration(TIME.START_OF_DAY, 
+        new Event("Event 3", TimeRange.fromStartDuration(TimeRange.START_OF_DAY, 
             DURATION_ALL_DAY), Arrays.asList(PERSON_C)));
 
     MeetingRequest request =
@@ -315,7 +314,7 @@ public final class FindMeetingQueryTest {
   }
 
   @Test
-  public void everyAttendeeAndOptionalIsConsideredChange(removeEarly) {
+  public void everyAttendeeAndOptionalIsConsideredChange() {
     // Have each person have different events. We should see two options because each person has
     // split the restricted times.
     //
@@ -363,8 +362,8 @@ public final class FindMeetingQueryTest {
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0830AM, false),
             Arrays.asList(PERSON_A)),
         new Event("Event 2", TimeRange.fromStartEnd(TIME_0900AM, TimeRange.END_OF_DAY, true),
-            Arrays.asList(PERSON_A))
-        new Event("Event 3", TimeRange.fromStartDuration(TIME_830AM, DURATION_15_MINUTES),
+            Arrays.asList(PERSON_A)),
+        new Event("Event 3", TimeRange.fromStartDuration(TIME_0830AM, DURATION_15_MINUTES),
             Arrays.asList(PERSON_C)));
 
     MeetingRequest request = new MeetingRequest(Arrays.asList(PERSON_A), DURATION_30_MINUTES);
@@ -419,9 +418,9 @@ public final class FindMeetingQueryTest {
     // actual attendees.
 
     Collection<Event> events = Arrays.asList(
-        new Event("Event 1", TimeRange.fromStartDuration(TIME_0800AM, DURATION_8_HOUR),
+        new Event("Event 1", TimeRange.fromStartDuration(TimeRange.START_OF_DAY, DURATION_8_HOUR),
             Arrays.asList(PERSON_A)),
-        new Event("Event 2", TimeRange.fromStartDuration(TIME_0400PM, DURATION_16_HOUR),
+        new Event("Event 2", TimeRange.fromStartDuration(TIME_0800AM, DURATION_16_HOUR),
             Arrays.asList(PERSON_B)));
 
     // Add no formal attendees, only actual attendees.
