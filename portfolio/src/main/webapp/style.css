@@ -98,6 +98,14 @@ li {
   color: rgb(160, 160, 160);
 }
 
+#auth-username-container {
+  margin: 10px 0;
+}
+
+#comment-box, #username-box {
+  width: 250px;
+}
+
 form {
   margin: 10px 0;
 }

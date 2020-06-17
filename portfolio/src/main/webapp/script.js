@@ -100,7 +100,8 @@ $(document).ready(() => {
   // Add frontend styling.
   fadeDiv('.project');
 
-  // Disable post comment and max comments shown submit buttons, by default.
+  // Disable post username, comment, and max comments shown submit buttons.
+  disableSubmit('username-submit');
   disableSubmit('comment-submit');
   disableSubmit('comment-max-submit');
 
@@ -150,9 +151,9 @@ function createComment(comment) {
   dateElement.innerText = comment.date + " UTC";
   dateElement.className = 'span-comment span-comment-date';
 
-  // Create span element holding the user email who posted the comment.
+  // Create span element holding the username and email who posted the comment.
   const userEmailElement = document.createElement('a');
-  userEmailElement.innerText = comment.user.emailAddress;
+  userEmailElement.innerText = comment.user.username;
   userEmailElement.href = 'mailto:' + comment.user.emailAddress;
   userEmailElement.target = '_blank';
   userEmailElement.className = 'span-comment span-comment-email';
@@ -236,6 +237,10 @@ function addAuth() {
 
     // Dynamically construct auth information based on user login status.
     if (authObj.loggedIn) {
+      // Create paragraph element holding the username.
+      const displayUsername = document.createElement('p');
+      displayUsername.innerText = 'Username: ' + authObj.username;
+
       // Create paragraph element holding the email.
       const displayEmail = document.createElement('p');
       displayEmail.innerText = 'Email: ' + authObj.email;
@@ -246,9 +251,15 @@ function addAuth() {
       logoutLink.href = authObj.logoutUrl;
 
       // Add the components to the auth-container div.
+      authContainerDiv.append(displayUsername);
       authContainerDiv.append(displayEmail);
       authContainerDiv.append(logoutLink);
     } else {
+      // Hide the "change username" container.
+      const changeUsernameContainer = 
+        document.getElementById('auth-username-container');
+      changeUsernameContainer.style.display = 'none';
+
       // Create link element that allows users to log in.
       const loginLink = document.createElement('a');
       loginLink.innerText = 'Login';
