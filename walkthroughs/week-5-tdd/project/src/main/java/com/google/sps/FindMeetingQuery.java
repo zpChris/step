@@ -42,16 +42,16 @@ public final class FindMeetingQuery {
     int meetingDuration = (int) request.getDuration();
 
     // If no attendees (regular or optional) exist, return the whole day.
-    if (attendees.isEmpty() && optionalAttendees.isEmpty()) {
+    if (collectionIsEmpty(attendees) && collectionIsEmpty(optionalAttendees)) {
       List<TimeRange> allDayTimeRangeList = new ArrayList<TimeRange>();
       allDayTimeRangeList.add(TimeRange.WHOLE_DAY);
       return allDayTimeRangeList;
-    } else if (attendees.isEmpty()) {
+    } else if (collectionIsEmpty(attendees)) {
       // If only optional attendees exist, create a schedule for them.
       invalidOptionalTimeRanges = getAndMergeInvalidTimeRanges(
         invalidOptionalTimeRanges, events, optionalAttendees);
       List<TimeRange> validOptionalTimeRanges = getValidTimeRanges(
-        invalidOptionalTimeRanges, meetingDuration);
+      invalidOptionalTimeRanges, meetingDuration);
       return validOptionalTimeRanges;
     }
 
@@ -71,6 +71,18 @@ public final class FindMeetingQuery {
 
     return validTimeRanges;
 
+  }
+
+  /**
+   * Returns true if a collection is empty, which in this case means either
+   * it has no elements OR it has only one element, which is an empty string.
+   * 
+   * This method is created because the frontend setup returns a Collection with
+   * a single empty string rather than an empty collection.
+   */
+  private boolean collectionIsEmpty(Collection<String> collection) {
+    return collection.isEmpty() || 
+      (collection.size() == 1 && collection.iterator().next().equals(""));
   }
 
   /**
