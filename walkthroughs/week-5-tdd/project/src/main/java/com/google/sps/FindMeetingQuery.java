@@ -115,17 +115,17 @@ public final class FindMeetingQuery {
         validTimeRanges.remove(validTimeRange);
         for (TimeRange builtValidTimeRange : builtValidTimeRanges) {
           validTimeRanges.add(iotrIndex, builtValidTimeRange);
-          iotrIndex++;
+          vtrIndex++;
         }
-        iotrIndex--;
+        vtrIndex--;
       }
 
       // Update the vtrIndex or iotrIndex depending on sorted order.
-      if (iotrIndex == -1 || validTimeRanges.get(vtrIndex).end() >= 
+      if (vtrIndex == -1 || validTimeRanges.get(vtrIndex).end() <= 
         invalidOptionalTimeRanges.get(iotrIndex).end()) {
-        iotrIndex++;
-      } else {
         vtrIndex++;
+      } else {
+        iotrIndex++;
       }
     }
 
