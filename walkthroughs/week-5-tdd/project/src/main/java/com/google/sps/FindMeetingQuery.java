@@ -87,7 +87,7 @@ public final class FindMeetingQuery {
     // Create indices for validTimeRanges (vtr) and invalidOptionalTimeRanges (iotr).
     int vtrIndex = 0;
     int iotrIndex = 0;
-    while (vtrIndex < validTimeRanges.size() - 1 &&
+    while (vtrIndex < validTimeRanges.size() &&
       iotrIndex < invalidOptionalTimeRanges.size()) {
 
       // Get the two TimeRanges in question.
@@ -109,12 +109,11 @@ public final class FindMeetingQuery {
       }
 
       // Update the vtrIndex or iotrIndex depending on sorted order.
-      if (validTimeRanges.get(vtrIndex).end() < 
+      if (iotrIndex == -1 || validTimeRanges.get(vtrIndex).end() >= 
         invalidOptionalTimeRanges.get(iotrIndex).end()) {
-        
-        vtrIndex++;
-      } else {
         iotrIndex++;
+      } else {
+        vtrIndex++;
       }
     }
 
