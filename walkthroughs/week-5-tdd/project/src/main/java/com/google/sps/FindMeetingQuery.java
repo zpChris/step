@@ -35,21 +35,11 @@ public final class FindMeetingQuery {
     int meetingDuration = (int) request.getDuration();
 
     // Populate invalidTimeRanges variable, and sort by increasing start time.
-    invalidTimeRanges = getInvalidTimeRanges(invalidTimeRanges, events, attendees);
-    Collections.sort(invalidTimeRanges, new Comparator<TimeRange>() {
-      public int compare(TimeRange t1, TimeRange t2) {
-        if (t1.start() < t2.start()) {
-          return -1;
-        } else if (t1.start() == t2.start()) {
-          return 0;
-        } else {
-          return 1;
-        }
-      }
-    });
+    populateInvalidTimeRanges(invalidTimeRanges, events, attendees);
+    Collections.sort(invalidTimeRanges, TimeRange.ORDER_BY_START);
 
     // Merge conflicting TimeRanges.
-    invalidTimeRanges = mergeConflictingTimeRanges(invalidTimeRanges);
+    mergeConflictingTimeRanges(invalidTimeRanges);
 
     // Get the inverse / valid TimeRanges of the invalidTimeRanges.
     List<TimeRange> validTimeRanges = getValidTimeRanges(invalidTimeRanges, 
@@ -98,8 +88,8 @@ public final class FindMeetingQuery {
       index++;
     }
 
-    // Get the last valid TimeRange, if applicable (inclusive on END_OF_DAY).
-    if (start != TimeRange.END_OF_DAY + 1 && 
+    // Get the last valid TimeRange, if applicable.
+    if (start != TimeRange.END_OF_DAY && 
       fitsMeetingDuration(TimeRange.END_OF_DAY - start, meetingDuration)) {
 
       validTimeRanges.add(
@@ -110,15 +100,16 @@ public final class FindMeetingQuery {
   }
 
   /**
-   * Merge any conflicting TimeRanges in the invalidTimeRanges list.
+   * Merge any conflicting TimeRanges in the unmergedTimeRanges list.
+   * The unmergedTimeRanges list must be sorted by start-time. This will modify
+   * the original list, so no return is necessary.
    */
-  private List<TimeRange> mergeConflictingTimeRanges(
-    List<TimeRange> invalidTimeRanges) {
+  private void mergeConflictingTimeRanges(List<TimeRange> unmergedTimeRanges) {
       
     int index = 0;
-    while (index < invalidTimeRanges.size() - 1) {
-      TimeRange firstTimeRange = invalidTimeRanges.get(index);
-      TimeRange secondTimeRange = invalidTimeRanges.get(index + 1);
+    while (index < unmergedTimeRanges.size() - 1) {
+      TimeRange firstTimeRange = unmergedTimeRanges.get(index);
+      TimeRange secondTimeRange = unmergedTimeRanges.get(index + 1);
 
       // Check if TimeRanges conflict, and if so, merge them.
       if (firstTimeRange.overlaps(secondTimeRange)) {
@@ -129,24 +120,21 @@ public final class FindMeetingQuery {
           endMergedTime, false);
 
         // Remove old TimeRanges, and add new merged TimeRange.
-        invalidTimeRanges.remove(firstTimeRange);
-        invalidTimeRanges.remove(secondTimeRange);
-        invalidTimeRanges.add(index, mergedTimeRange);
+        unmergedTimeRanges.remove(firstTimeRange);
+        unmergedTimeRanges.remove(secondTimeRange);
+        unmergedTimeRanges.add(index, mergedTimeRange);
       } else {
         index++;
       }
     }
-
-    return invalidTimeRanges;
-
   }
 
   /**
    * Return all of the invalid TimeRanges (conflicting events) to a list.
+   * This method modifies the original list, so no return is necessary.
    */
-  private List<TimeRange> getInvalidTimeRanges(
-    List<TimeRange> invalidTimeRanges, Collection<Event> events, 
-    Collection<String> attendees) {
+  private void populateInvalidTimeRanges(List<TimeRange> invalidTimeRanges, 
+    Collection<Event> events, Collection<String> attendees) {
 
     // Add event TimeRange if event has attendees in current meeting query.
     for (Event e : events) {
@@ -154,8 +142,6 @@ public final class FindMeetingQuery {
         invalidTimeRanges.add(e.getWhen());
       }
     }
-
-    return invalidTimeRanges;
   }
 
   /**
