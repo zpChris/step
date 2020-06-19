@@ -19,27 +19,28 @@ import com.google.appengine.api.blobstore.BlobInfoFactory;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.images.ImagesService;
-import com.google.appengine.api.images.ImagesServiceFactory;
-import com.google.appengine.api.images.ServingUrlOptions;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Map;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.ServingUrlOptions;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.google.gson.Gson;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -51,8 +52,10 @@ public class DataServlet extends HttpServlet {
   // String identifiers for comment attributes.
   public static final String COMMENT_TEXT = "text";
   public static final String COMMENT_DATE = "date";
-  public static final String COMMENT_NAME = "Comment";
   public static final String COMMENT_EMAIL = "userEmail";
+  public static final String COMMENT_ID = "id";
+  public static final String COMMENT_USERNAME = "username";
+  public static final String COMMENT_NAME = "Comment";
   public static final String COMMENT_MAX = "comment-max";
   public static final String COMMENT_IMAGE = "imageUrl";
 
@@ -120,7 +123,11 @@ public class DataServlet extends HttpServlet {
       String imageUrl = (String) entity.getProperty(COMMENT_IMAGE);
       long id = entity.getKey().getId();
       String email = (String) entity.getProperty(COMMENT_EMAIL);
-      User user = new User(email);
+      String userId = (String) entity.getProperty(COMMENT_ID);
+      
+      // The username is not fetched from the entity as it could be updated.
+      String username = AuthServlet.getUsername(email, userId);
+      User user = new User(email, userId, username);
       Comment comment = new Comment(id, text, date, imageUrl, user);
       comments.add(comment);
 
@@ -158,20 +165,35 @@ public class DataServlet extends HttpServlet {
   }
 
   /**
+   * Returns the id of the user, if the user is logged in.
+   * If no user is logged in, return null (however, a user 
+   * only has post access when logged in).
+   */
+  public String getUserId() {
+    if (userService.isUserLoggedIn()) {
+      return userService.getCurrentUser().getUserId();
+    }
+    return null;
+  }
+
+  /**
    * Handle logic of posting comment and redirecting user to original page.
    */
   private void postComment(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String text = getParameter(request, "text-input", "");
     Date date = new Date();
-    String email = getUserEmail();
-    
+    String userEmail = getUserEmail();
+
     // Catch an unexpected error where the user posted a comment without logging in.
-    if (email == null) {
+    if (userEmail == null) {
       response.sendRedirect("/");
       return;
     }
 
-    User user = new User(email);
+    // Build user attributes.
+    String userId = getUserId();
+    String username = AuthServlet.getUsername(userEmail, userId);
+    User user = new User(userEmail, userId, username);
 
     // Get the URL of the image that the user uploaded to Blobstore.
     // If no image was uploaded, this will simply be undefined and will be 
@@ -300,6 +322,8 @@ public class DataServlet extends HttpServlet {
       commentEntity.setProperty(COMMENT_DATE, this.date);
       commentEntity.setProperty(COMMENT_IMAGE, this.imageUrl);
       commentEntity.setProperty(COMMENT_EMAIL, this.user.emailAddress);
+      commentEntity.setProperty(COMMENT_ID, this.user.id);
+      commentEntity.setProperty(COMMENT_USERNAME, this.user.username);
       return commentEntity;
     }
   }
@@ -309,10 +333,15 @@ public class DataServlet extends HttpServlet {
    */
   class User {
     // The fields that hold relevant user data.
+    // The id is used to keep the username up-to-date.
     private String emailAddress;
+    private String id;
+    private String username;
 
-    public User(String emailAddress) {
+    public User(String emailAddress, String id, String username) {
       this.emailAddress = emailAddress;
+      this.id = id;
+      this.username = username;
     }
   }
 

@@ -22,6 +22,17 @@
       <div id="fact-container"></div>
       <h2>Comments</h2>
       <div id="auth-container"></div>
+      <div id="auth-username-container">
+        <div id="auth-username-current"></div>
+        <form action="/auth" method="POST">
+          <textarea id="username-box" name="text-input" maxlength="16" 
+            oninput="checkSubmit('username-box', 'username-submit')"  
+            placeholder="Enter a username (no spaces, sixteen chars max)..."
+            onkeypress="return event.charCode != 32"></textarea>
+          <br>
+          <input id="username-submit" type="submit" />
+        </form>
+      </div>
       <div id="comment-section-container">
         <button id="delete-all-comments" onclick="deleteAllComments()">
           Delete All Comments
@@ -30,7 +41,7 @@
         enctype="multipart/form-data">
           <textarea id="comment-box" name="text-input"
             oninput="checkSubmit('comment-box', 'comment-submit')"  
-            minlength="1" placeholder="Join the discussion..."></textarea>
+            placeholder="Join the discussion..."></textarea>
           <br>
           <p>Upload an image:</p>
           <input type="file" name="image">
